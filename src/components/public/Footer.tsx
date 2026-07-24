@@ -1,0 +1,79 @@
+import React from 'react';
+import { ISocialLink } from '@/types';
+import { GithubIcon, LinkedinIcon, LeetCodeIcon } from '@/components/ui/Icons';
+import { Mail, Phone, Globe } from 'lucide-react';
+
+interface FooterProps {
+  content: Record<string, string>;
+  socialLinks?: ISocialLink[];
+}
+
+export default function Footer({ content, socialLinks = [] }: FooterProps) {
+  const logoText = content.navbar_logo || 'KG.';
+  const subtext = content.footer_subtext || 'Building products, learning continuously.';
+  const footerCopy = content.footer_copy || 'Designed & Built by Krishna Garg';
+  const copyright = content.footer_copyright || '© 2026';
+
+  // Filter visible social links that have a valid URL and sort by display order
+  const visibleSocials = socialLinks
+    .filter((link) => link.visible !== false && link.url && link.url.trim() !== '')
+    .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
+  // Helper to resolve icon component based on platform name
+  const renderSocialIcon = (platform: string) => {
+    const p = platform.toLowerCase();
+    if (p.includes('github')) return <GithubIcon className="w-4 h-4" />;
+    if (p.includes('linkedin')) return <LinkedinIcon className="w-4 h-4" />;
+    if (p.includes('leetcode')) return <LeetCodeIcon className="w-4 h-4" />;
+    if (p.includes('mail') || p.includes('email')) return <Mail className="w-4 h-4" />;
+    if (p.includes('phone') || p.includes('whatsapp')) return <Phone className="w-4 h-4" />;
+    return <Globe className="w-4 h-4" />;
+  };
+
+  return (
+    <footer className="bg-zinc-950 text-zinc-100 border-t border-zinc-900 py-10 sm:py-12">
+      <div className="max-w-6xl mx-auto px-6 flex flex-col gap-8">
+        {/* Main Content Row */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          {/* Left Side — Logo & Short Developer Closing Sentence */}
+          <div className="flex flex-col gap-1.5">
+            <span className="font-bold text-xl text-zinc-100 tracking-tight font-sans">
+              {logoText}
+            </span>
+            <p className="text-xs sm:text-sm text-zinc-400 font-sans">
+              {subtext}
+            </p>
+          </div>
+
+          {/* Right Side — Compact Clickable Brand Icons Only */}
+          {visibleSocials.length > 0 && (
+            <div className="flex items-center gap-2.5">
+              {visibleSocials.map((link) => (
+                <a
+                  key={link._id || link.platform}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.label || link.platform}
+                  title={link.label || link.platform}
+                  className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 hover:bg-zinc-800 hover:-translate-y-0.5 transition-all"
+                >
+                  {renderSocialIcon(link.platform)}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Thin Divider */}
+        <div className="h-px w-full bg-zinc-900" />
+
+        {/* Bottom Metadata Bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-zinc-500">
+          <span>{footerCopy}</span>
+          <span>{copyright}</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
