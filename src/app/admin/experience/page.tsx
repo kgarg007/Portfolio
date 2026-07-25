@@ -5,9 +5,15 @@ import ExperienceManager from './ExperienceManager';
 export const revalidate = 0;
 
 export default async function AdminExperiencePage() {
-  await connectToDatabase();
-  const docs = await Experience.find().sort({ displayOrder: 1, createdAt: -1 }).lean();
-  const experiences = JSON.parse(JSON.stringify(docs));
+  let experiences = [];
+
+  try {
+    await connectToDatabase();
+    const docs = await Experience.find().sort({ displayOrder: 1, createdAt: -1 }).lean();
+    experiences = JSON.parse(JSON.stringify(docs));
+  } catch (error: any) {
+    console.error('Failed to load experiences in AdminExperiencePage:', error);
+  }
 
   return (
     <div className="flex flex-col gap-8">

@@ -14,8 +14,6 @@ function applyDnsFix() {
 // Apply DNS configuration server-side at module load time
 applyDnsFix();
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -35,8 +33,9 @@ if (!global.mongooseCache) {
 export async function connectToDatabase(): Promise<typeof mongoose> {
   // Ensure DNS configuration is active before any lookup or connection attempt
   applyDnsFix();
+  const uri = process.env.MONGODB_URI;
 
-  if (!MONGODB_URI) {
+  if (!uri) {
     throw new Error(
       'MONGODB_URI environment variable is missing. Please define MONGODB_URI in your .env.local file.'
     );
@@ -57,7 +56,7 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
       };
 
       try {
-        const m = await mongoose.connect(MONGODB_URI, opts);
+        const m = await mongoose.connect(uri, opts);
         console.log('Successfully connected to MongoDB Atlas.');
         return m;
       } catch (err: any) {
@@ -69,7 +68,7 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
             String(err.message || '').includes('querySrv'))
         ) {
           applyDnsFix();
-          const m = await mongoose.connect(MONGODB_URI, opts);
+          const m = await mongoose.connect(uri, opts);
           console.log('Successfully connected to MongoDB Atlas.');
           return m;
         }
@@ -87,5 +86,3 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
 
   return cached.conn;
 }
-
-

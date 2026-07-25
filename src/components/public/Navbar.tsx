@@ -16,7 +16,6 @@ export default function Navbar({ logoText = 'KG.', items = [], settings }: Navba
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('about');
 
-  // Primary navigation sections mandated by requirements
   const defaultNavItems = [
     { label: 'About', url: '#about' },
     { label: 'Work', url: '#projects' },
@@ -25,7 +24,6 @@ export default function Navbar({ logoText = 'KG.', items = [], settings }: Navba
     { label: 'Contact', url: '#contact' },
   ];
 
-  // Filter or use items if provided, or default to standard items
   const navLinks = items.length > 0
     ? items.filter((i) => ['#about', '#projects', '#experience', '#achievements', '#contact'].includes(i.url))
     : defaultNavItems;
@@ -40,7 +38,6 @@ export default function Navbar({ logoText = 'KG.', items = [], settings }: Navba
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // IntersectionObserver for active section highlighting
   useEffect(() => {
     const sectionIds = ['about', 'projects', 'experience', 'achievements', 'contact'];
     const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
@@ -69,15 +66,15 @@ export default function Navbar({ logoText = 'KG.', items = [], settings }: Navba
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-zinc-950/85 backdrop-blur-md border-b border-zinc-800/80 py-3'
-          : 'bg-transparent py-5'
+          ? 'bg-[#101012]/90 backdrop-blur-md border-b border-[#202024] py-2.5'
+          : 'bg-transparent py-4'
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="font-mono font-bold text-xl tracking-tighter text-zinc-100 hover:text-indigo-400 transition-colors"
+          className="font-sans font-bold text-lg tracking-tight text-[#FAFAFA] hover:text-indigo-400 transition-colors"
         >
           {logoText}
         </Link>
@@ -93,8 +90,8 @@ export default function Navbar({ logoText = 'KG.', items = [], settings }: Navba
                 href={item.url}
                 className={`transition-all py-1 border-b-2 ${
                   isActive
-                    ? 'text-indigo-400 border-indigo-500 font-semibold'
-                    : 'text-zinc-400 border-transparent hover:text-zinc-100'
+                    ? 'text-indigo-400 border-indigo-500 font-medium'
+                    : 'text-zinc-400 border-transparent hover:text-[#FAFAFA]'
                 }`}
               >
                 {item.label}
@@ -110,16 +107,16 @@ export default function Navbar({ logoText = 'KG.', items = [], settings }: Navba
               href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700/80 text-zinc-100 hover:bg-zinc-800 hover:border-zinc-500 transition-all shadow-sm"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-medium px-3.5 py-1.5 rounded-lg bg-[#161618] border border-[#202024] text-zinc-200 hover:bg-[#1C1C20] hover:border-white/20 hover:text-white transition-all shadow-sm"
             >
-              <FileText className="w-3.5 h-3.5 text-indigo-400" />
+              <FileText className="w-3.5 h-3.5 text-indigo-400/80" />
               <span>{resumeLabel}</span>
               <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
             </a>
           ) : (
             <a
               href="#contact"
-              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white transition-all"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-medium px-3.5 py-1.5 rounded-lg bg-[#161618] border border-[#202024] text-zinc-200 hover:text-white hover:bg-[#1C1C20] transition-all"
             >
               Get in Touch
             </a>
@@ -138,7 +135,7 @@ export default function Navbar({ logoText = 'KG.', items = [], settings }: Navba
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-x-0 top-[60px] bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-800 p-6 flex flex-col gap-4 font-mono text-sm text-zinc-300 z-40 shadow-2xl">
+        <div className="md:hidden fixed inset-x-0 top-[56px] bg-[#101012]/95 backdrop-blur-xl border-b border-[#202024] p-6 flex flex-col gap-4 font-mono text-sm text-zinc-300 z-40 shadow-2xl">
           {displayLinks.map((item) => {
             const sectionId = item.url.replace('#', '');
             const isActive = activeSection === sectionId;
@@ -148,7 +145,7 @@ export default function Navbar({ logoText = 'KG.', items = [], settings }: Navba
                 href={item.url}
                 onClick={() => setMobileOpen(false)}
                 className={`py-2 px-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-indigo-500/10 text-indigo-400 font-bold border-l-2 border-indigo-500' : 'hover:bg-zinc-900 hover:text-white'
+                  isActive ? 'bg-indigo-500/10 text-indigo-400 font-bold border-l-2 border-indigo-500' : 'hover:bg-[#161618] hover:text-white'
                 }`}
               >
                 {item.label}
@@ -162,7 +159,7 @@ export default function Navbar({ logoText = 'KG.', items = [], settings }: Navba
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileOpen(false)}
-              className="mt-2 inline-flex items-center justify-center gap-2 text-xs font-semibold px-4 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition-colors"
+              className="mt-2 inline-flex items-center justify-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-lg bg-indigo-600/90 text-white hover:bg-indigo-600 transition-colors"
             >
               <FileText className="w-4 h-4" /> {resumeLabel} <ArrowUpRight className="w-4 h-4" />
             </a>

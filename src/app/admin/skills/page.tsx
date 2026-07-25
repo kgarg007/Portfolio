@@ -5,9 +5,15 @@ import SkillManager from './SkillManager';
 export const revalidate = 0;
 
 export default async function AdminSkillsPage() {
-  await connectToDatabase();
-  const docs = await Skill.find().sort({ displayOrder: 1, createdAt: -1 }).lean();
-  const skills = JSON.parse(JSON.stringify(docs));
+  let skills = [];
+
+  try {
+    await connectToDatabase();
+    const docs = await Skill.find().sort({ displayOrder: 1, createdAt: -1 }).lean();
+    skills = JSON.parse(JSON.stringify(docs));
+  } catch (error: any) {
+    console.error('Failed to load skills in AdminSkillsPage:', error);
+  }
 
   return (
     <div className="flex flex-col gap-8">

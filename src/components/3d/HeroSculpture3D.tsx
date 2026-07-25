@@ -17,68 +17,68 @@ export default function HeroSculpture3D() {
     const mouseY = state.pointer.y * 0.5;
 
     if (outerGroup.current) {
-      outerGroup.current.rotation.y = THREE.MathUtils.lerp(outerGroup.current.rotation.y, mouseX * 0.8 + t * 0.15, 0.05);
-      outerGroup.current.rotation.x = THREE.MathUtils.lerp(outerGroup.current.rotation.x, -mouseY * 0.5 + Math.sin(t * 0.3) * 0.1, 0.05);
+      outerGroup.current.rotation.y = THREE.MathUtils.lerp(outerGroup.current.rotation.y, mouseX * 0.5 + t * 0.1, 0.04);
+      outerGroup.current.rotation.x = THREE.MathUtils.lerp(outerGroup.current.rotation.x, -mouseY * 0.3 + Math.sin(t * 0.2) * 0.08, 0.04);
     }
 
     if (innerMesh.current) {
-      innerMesh.current.rotation.z = t * 0.2;
-      innerMesh.current.rotation.y = t * 0.25;
+      innerMesh.current.rotation.z = t * 0.15;
+      innerMesh.current.rotation.y = t * 0.18;
     }
 
     if (ringMesh1.current) {
-      ringMesh1.current.rotation.x = t * 0.4;
-      ringMesh1.current.rotation.y = t * 0.2;
+      ringMesh1.current.rotation.x = t * 0.25;
+      ringMesh1.current.rotation.y = t * 0.15;
     }
 
     if (ringMesh2.current) {
-      ringMesh2.current.rotation.x = -t * 0.3;
-      ringMesh2.current.rotation.z = t * 0.35;
+      ringMesh2.current.rotation.x = -t * 0.2;
+      ringMesh2.current.rotation.z = t * 0.25;
     }
   });
 
   return (
     <group ref={outerGroup} position={[0, 0, 0]}>
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[10, 10, 5]} intensity={1.5} color="#818cf8" />
-      <directionalLight position={[-10, -10, -5]} intensity={1.0} color="#a78bfa" />
-      <pointLight position={[0, 5, 0]} intensity={2.0} color="#67e8f9" distance={15} />
+      {/* Restrained Ambient & Directional Lighting — No bright cyan/purple */}
+      <ambientLight intensity={0.35} />
+      <directionalLight position={[10, 10, 5]} intensity={1.0} color="#818cf8" />
+      <directionalLight position={[-10, -10, -5]} intensity={0.6} color="#475569" />
 
-      <Float speed={2} rotationIntensity={0.5} floatIntensity={0.8}>
-        {/* Core Abstract TorusKnot Sculpture */}
+      <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
+        {/* Core Dark Metallic TorusKnot Sculpture */}
         <mesh ref={innerMesh} castShadow receiveShadow>
           <torusKnotGeometry args={[1.2, 0.35, 128, 32, 2, 3]} />
           <meshPhysicalMaterial
-            color="#18181b"
-            roughness={0.15}
-            metalness={0.9}
-            clearcoat={1.0}
-            clearcoatRoughness={0.1}
-            reflectivity={0.9}
-            emissive="#3f3f46"
-            emissiveIntensity={0.15}
+            color="#141416"
+            roughness={0.25}
+            metalness={0.85}
+            clearcoat={0.8}
+            clearcoatRoughness={0.2}
+            reflectivity={0.7}
+            emissive="#18181b"
+            emissiveIntensity={0.05}
           />
         </mesh>
 
-        {/* Outer Wireframe Accent Ring 1 */}
+        {/* Outer Wireframe Accent Ring 1 (Muted Indigo) */}
         <mesh ref={ringMesh1} scale={1.85}>
-          <torusGeometry args={[1.3, 0.015, 16, 100]} />
+          <torusGeometry args={[1.3, 0.012, 16, 100]} />
           <meshStandardMaterial
-            color="#818cf8"
+            color="#6366f1"
             wireframe
-            emissive="#6366f1"
-            emissiveIntensity={0.8}
+            emissive="#4f46e5"
+            emissiveIntensity={0.35}
           />
         </mesh>
 
-        {/* Outer Wireframe Accent Ring 2 */}
+        {/* Outer Wireframe Accent Ring 2 (Neutral Slate/Grey) */}
         <mesh ref={ringMesh2} scale={2.2}>
-          <torusGeometry args={[1.3, 0.01, 16, 100]} />
+          <torusGeometry args={[1.3, 0.008, 16, 100]} />
           <meshStandardMaterial
-            color="#38bdf8"
+            color="#64748b"
             wireframe
-            emissive="#0284c7"
-            emissiveIntensity={0.6}
+            emissive="#475569"
+            emissiveIntensity={0.25}
           />
         </mesh>
       </Float>

@@ -55,8 +55,8 @@ export default function ExperienceManager({ initialExperiences }: ExperienceMana
       setError('Please upload a PDF, JPG, PNG, or WEBP file.');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      setError('File size must be under 10MB.');
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Certificate file must be smaller than 4MB.');
       return;
     }
 

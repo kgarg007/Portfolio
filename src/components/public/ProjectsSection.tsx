@@ -19,17 +19,17 @@ export default function ProjectsSection({ content, projects }: ProjectsSectionPr
   if (!projects || projects.length === 0) return null;
 
   return (
-    <section id="projects" className="py-20 border-t border-zinc-800/60 bg-zinc-950/80 relative">
+    <section id="projects" className="py-20 border-t border-[#202024] bg-[#101012] relative">
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
         <div className="flex flex-col gap-2 mb-12">
           <span className="font-mono text-xs text-indigo-400 font-semibold tracking-wider uppercase">
             {eyebrow}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100 max-w-2xl font-sans">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] max-w-2xl font-sans">
             {heading}
           </h2>
-          <p className="text-sm sm:text-base text-zinc-400 max-w-xl font-sans">
+          <p className="text-sm sm:text-base text-[#A1A1AA] max-w-xl font-sans">
             {description}
           </p>
           <div className="w-10 h-1 bg-indigo-500 rounded-full mt-2" />
@@ -41,19 +41,22 @@ export default function ProjectsSection({ content, projects }: ProjectsSectionPr
             const hasCaseStudy = Boolean(
               project.fullDescription || project.problem || project.solution || project.challenges
             );
+            const coverUrl = typeof project.coverImage === 'string' ? project.coverImage : project.coverImage?.url;
+            const coverAlt = typeof project.coverImage === 'object' ? (project.coverImage?.altText || project.name) : project.name;
 
             return (
               <div
                 key={project._id || project.slug}
-                className="group rounded-xl bg-zinc-900/60 border border-zinc-800/90 p-6 hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between gap-5 shadow-sm"
+                className="group rounded-xl bg-[#161618] border border-[#202024] p-6 hover:bg-[#1C1C20] hover:border-white/20 transition-all duration-300 flex flex-col justify-between gap-5 shadow-sm"
               >
                 {/* Thumbnail / Fallback Visual */}
-                <div className="w-full h-44 relative rounded-lg overflow-hidden border border-zinc-800/80 bg-zinc-950 flex items-center justify-center shrink-0">
-                  {project.coverImage?.url ? (
+                <div className="w-full h-44 relative rounded-lg overflow-hidden border border-[#202024] bg-[#101012] flex items-center justify-center shrink-0">
+                  {coverUrl ? (
                     <Image
-                      src={project.coverImage.url}
-                      alt={project.coverImage.altText || project.name}
+                      src={coverUrl}
+                      alt={coverAlt}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 560px"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
@@ -65,7 +68,7 @@ export default function ProjectsSection({ content, projects }: ProjectsSectionPr
 
                   {/* Badges Overlay */}
                   <div className="absolute top-3 left-3 flex items-center gap-2 z-10 font-mono text-[11px]">
-                    <span className="px-2.5 py-1 rounded bg-zinc-950/90 border border-zinc-800 text-zinc-300 backdrop-blur-md">
+                    <span className="px-2.5 py-1 rounded bg-[#101012]/90 border border-[#202024] text-zinc-300 backdrop-blur-md">
                       {project.category}
                     </span>
                     {project.featured && (
@@ -78,11 +81,11 @@ export default function ProjectsSection({ content, projects }: ProjectsSectionPr
 
                 {/* Card Content */}
                 <div className="flex flex-col gap-2.5 flex-1">
-                  <h3 className="text-xl font-bold text-zinc-100 group-hover:text-indigo-300 transition-colors font-sans tracking-tight">
+                  <h3 className="text-xl font-bold text-[#FAFAFA] group-hover:text-indigo-300 transition-colors font-sans tracking-tight">
                     {project.name}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans line-clamp-2">
+                  <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed font-sans line-clamp-2">
                     {project.shortDescription}
                   </p>
 
@@ -92,7 +95,7 @@ export default function ProjectsSection({ content, projects }: ProjectsSectionPr
                       {project.techStack.map((tech) => (
                         <span
                           key={tech}
-                          className="px-2 py-0.5 rounded bg-zinc-950 border border-zinc-800/90 text-zinc-400"
+                          className="px-2 py-0.5 rounded bg-[#101012] border border-[#202024] text-zinc-400"
                         >
                           {tech}
                         </span>
@@ -102,14 +105,14 @@ export default function ProjectsSection({ content, projects }: ProjectsSectionPr
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-between gap-3 pt-3 border-t border-zinc-800/60 font-mono text-xs mt-auto">
+                <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#202024] font-mono text-xs mt-auto">
                   <div className="flex items-center gap-2">
                     {project.githubUrl && (
                       <a
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-zinc-950 border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 transition-all text-xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#101012] border border-[#202024] text-zinc-300 hover:text-white hover:border-white/20 hover:bg-[#161618] transition-all text-xs"
                       >
                         <GithubIcon className="w-3.5 h-3.5" /> Code
                       </a>
@@ -120,7 +123,7 @@ export default function ProjectsSection({ content, projects }: ProjectsSectionPr
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-zinc-950 border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 transition-all text-xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#101012] border border-[#202024] text-zinc-300 hover:text-white hover:border-white/20 hover:bg-[#161618] transition-all text-xs"
                       >
                         <ExternalLink className="w-3.5 h-3.5" /> Live
                       </a>

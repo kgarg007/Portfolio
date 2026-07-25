@@ -20,6 +20,11 @@ export default function ResumeManager({ currentResume }: ResumeManagerProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Resume file must be smaller than 4MB.');
+      return;
+    }
+
     setUploading(true);
     setError('');
     setSuccess('');

@@ -14,12 +14,10 @@ export default function Footer({ content, socialLinks = [] }: FooterProps) {
   const footerCopy = content.footer_copy || 'Designed & Built by Krishna Garg';
   const copyright = content.footer_copyright || `© ${new Date().getFullYear()}`;
 
-  // Filter visible social links that have a valid URL and filter out raw phone entries
   const visibleSocials = socialLinks
     .filter((link) => link.visible !== false && link.url && link.url.trim() !== '' && !link.platform.toLowerCase().includes('phone number'))
     .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
-  // Helper to resolve icon component based on platform name
   const renderSocialIcon = (platform: string) => {
     const p = platform.toLowerCase();
     if (p.includes('github')) return <GithubIcon className="w-4 h-4" />;
@@ -31,16 +29,16 @@ export default function Footer({ content, socialLinks = [] }: FooterProps) {
   };
 
   return (
-    <footer className="bg-zinc-950 text-zinc-100 border-t border-zinc-900 py-10 sm:py-12">
+    <footer className="bg-[#101012] text-[#D4D4D8] border-t border-[#202024] py-10 sm:py-12">
       <div className="max-w-6xl mx-auto px-6 flex flex-col gap-8">
         {/* Main Content Row */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           {/* Left Side — Logo & Short Closing Sentence */}
           <div className="flex flex-col gap-1.5">
-            <span className="font-bold text-xl text-zinc-100 tracking-tight font-sans">
+            <span className="font-bold text-xl text-[#FAFAFA] tracking-tight font-sans">
               {logoText}
             </span>
-            <p className="text-xs sm:text-sm text-zinc-400 font-sans">
+            <p className="text-xs sm:text-sm text-[#A1A1AA] font-sans">
               {subtext}
             </p>
           </div>
@@ -58,7 +56,7 @@ export default function Footer({ content, socialLinks = [] }: FooterProps) {
                     rel="noopener noreferrer"
                     aria-label={label}
                     title={label}
-                    className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 hover:bg-zinc-800 transition-all"
+                    className="p-2.5 rounded-lg bg-[#161618] border border-[#202024] text-zinc-400 hover:text-[#FAFAFA] hover:border-white/20 hover:bg-[#1C1C20] transition-all"
                   >
                     {renderSocialIcon(link.platform)}
                   </a>
@@ -69,10 +67,10 @@ export default function Footer({ content, socialLinks = [] }: FooterProps) {
         </div>
 
         {/* Thin Divider */}
-        <div className="h-px w-full bg-zinc-900" />
+        <div className="h-px w-full bg-[#202024]" />
 
         {/* Bottom Metadata Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-zinc-500">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-[#71717A]">
           <span>{footerCopy}</span>
           <span>{copyright}</span>
         </div>

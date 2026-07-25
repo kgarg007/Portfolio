@@ -14,31 +14,44 @@ export const ContactMessageSchema = z.object({
 });
 
 export const ProjectSchema = z.object({
-  name: z.string().min(2, 'Project name is required'),
-  slug: z.string().min(2, 'Slug is required'),
+  name: z.string().min(1, 'Project name is required'),
+  slug: z.string().min(1, 'Slug is required'),
   category: z.string().default('Web App'),
-  shortDescription: z.string().min(10, 'Short description is required'),
-  fullDescription: z.string().min(20, 'Full case study description is required'),
-  problem: z.string().optional(),
-  solution: z.string().optional(),
-  role: z.string().optional(),
+  shortDescription: z.string().default(''),
+  fullDescription: z.string().default(''),
+  problem: z.string().optional().default(''),
+  solution: z.string().optional().default(''),
+  role: z.string().optional().default('Full Stack Developer'),
   features: z.array(z.string()).default([]),
   techStack: z.array(z.string()).default([]),
-  challenges: z.string().optional(),
-  outcome: z.string().optional(),
-  technicalDecisions: z.string().optional(),
-  coverImage: z.object({
-    url: z.string(),
-    publicId: z.string().optional(),
-    altText: z.string().optional(),
-  }).optional(),
-  githubUrl: z.string().url('Invalid GitHub URL').or(z.literal('')).optional(),
-  liveUrl: z.string().url('Invalid Live URL').or(z.literal('')).optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
+  challenges: z.string().optional().default(''),
+  outcome: z.string().optional().default(''),
+  technicalDecisions: z.string().optional().default(''),
+  coverImage: z
+    .union([
+      z.string(),
+      z.object({
+        url: z.string().optional().default(''),
+        publicId: z.string().optional().default(''),
+        altText: z.string().optional().default(''),
+      }),
+    ])
+    .optional()
+    .transform((val) => {
+      if (typeof val === 'string') return { url: val, publicId: '', altText: '' };
+      if (val && typeof val === 'object') return { url: val.url || '', publicId: val.publicId || '', altText: val.altText || '' };
+      return { url: '', publicId: '', altText: '' };
+    }),
+  githubUrl: z.string().or(z.literal('')).optional().default(''),
+  liveUrl: z.string().or(z.literal('')).optional().default(''),
+  startDate: z.string().optional().default(''),
+  endDate: z.string().optional().default(''),
   featured: z.boolean().default(false),
   published: z.boolean().default(true),
-  displayOrder: z.number().default(0),
+  displayOrder: z
+    .union([z.number(), z.string()])
+    .transform((val) => (typeof val === 'string' ? parseInt(val, 10) || 0 : val))
+    .default(0),
 });
 
 export const ExperienceSchema = z.object({

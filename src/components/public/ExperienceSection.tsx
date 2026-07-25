@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { IExperience } from '@/types';
-import { Calendar, MapPin, ExternalLink, FileText } from 'lucide-react';
+import { Calendar, MapPin, FileText } from 'lucide-react';
 import CertificateModal from '@/components/ui/CertificateModal';
 
 interface ExperienceSectionProps {
@@ -22,17 +22,17 @@ export default function ExperienceSection({ content, experiences }: ExperienceSe
   if (!experiences || experiences.length === 0) return null;
 
   return (
-    <section id="experience" className="py-20 border-t border-zinc-800/60 bg-zinc-950/40 relative">
+    <section id="experience" className="py-20 border-t border-[#202024] bg-[#101012] relative">
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
         <div className="flex flex-col gap-2 mb-12">
           <span className="font-mono text-xs text-indigo-400 font-semibold tracking-wider uppercase">
             {eyebrow}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100 max-w-2xl font-sans">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] max-w-2xl font-sans">
             {heading}
           </h2>
-          <p className="text-sm sm:text-base text-zinc-400 max-w-xl font-sans">
+          <p className="text-sm sm:text-base text-[#A1A1AA] max-w-xl font-sans">
             {description}
           </p>
           <div className="w-10 h-1 bg-indigo-500 rounded-full mt-2" />
@@ -49,12 +49,12 @@ export default function ExperienceSection({ content, experiences }: ExperienceSe
             return (
               <div
                 key={exp._id || exp.organization + exp.role}
-                className="rounded-xl bg-zinc-900/60 border border-zinc-800/80 p-6 flex flex-col justify-between gap-4 hover:border-zinc-700 transition-all shadow-sm"
+                className="rounded-xl bg-[#161618] border border-[#202024] p-6 flex flex-col justify-between gap-4 hover:bg-[#1C1C20] hover:border-white/20 transition-all shadow-sm"
               >
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-start justify-between gap-3 border-b border-zinc-800/80 pb-3">
+                  <div className="flex items-start justify-between gap-3 border-b border-[#202024] pb-3">
                     <div>
-                      <h3 className="text-lg font-bold text-zinc-100 font-sans tracking-tight leading-snug">
+                      <h3 className="text-lg font-bold text-[#FAFAFA] font-sans tracking-tight leading-snug">
                         {exp.role}
                       </h3>
                       <span className="text-indigo-400 font-mono text-xs font-semibold block mt-0.5">
@@ -62,7 +62,7 @@ export default function ExperienceSection({ content, experiences }: ExperienceSe
                       </span>
                     </div>
 
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-950 border border-zinc-800 font-mono text-[11px] text-zinc-400 shrink-0">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#101012] border border-[#202024] font-mono text-[11px] text-zinc-400 shrink-0">
                       <Calendar className="w-3 h-3 text-indigo-400" />
                       {dateDisplay}
                     </span>
@@ -75,7 +75,7 @@ export default function ExperienceSection({ content, experiences }: ExperienceSe
                   )}
 
                   {/* Bullet Points */}
-                  <ul className="flex flex-col gap-2 font-sans text-xs sm:text-sm text-zinc-400">
+                  <ul className="flex flex-col gap-2 font-sans text-xs sm:text-sm text-[#D4D4D8]">
                     {exp.description.map((point, idx) => (
                       <li key={idx} className="flex items-start gap-2">
                         <span className="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span>
@@ -90,7 +90,7 @@ export default function ExperienceSection({ content, experiences }: ExperienceSe
                       {exp.technologies.map((tech) => (
                         <span
                           key={tech}
-                          className="px-2 py-0.5 rounded bg-zinc-950 border border-zinc-800/80 text-zinc-400"
+                          className="px-2 py-0.5 rounded bg-[#101012] border border-[#202024] text-zinc-400"
                         >
                           {tech}
                         </span>
@@ -101,7 +101,7 @@ export default function ExperienceSection({ content, experiences }: ExperienceSe
 
                 {/* Certificate Action (Only if exists) */}
                 {hasCertificate && (
-                  <div className="pt-3 border-t border-zinc-800/60 font-mono text-xs mt-auto">
+                  <div className="pt-3 border-t border-[#202024] font-mono text-xs mt-auto">
                     <button
                       onClick={() =>
                         setActiveCertificate({

@@ -5,9 +5,15 @@ import AchievementManager from './AchievementManager';
 export const revalidate = 0;
 
 export default async function AdminAchievementsPage() {
-  await connectToDatabase();
-  const docs = await Achievement.find().sort({ displayOrder: 1, createdAt: -1 }).lean();
-  const achievements = JSON.parse(JSON.stringify(docs));
+  let achievements = [];
+
+  try {
+    await connectToDatabase();
+    const docs = await Achievement.find().sort({ displayOrder: 1, createdAt: -1 }).lean();
+    achievements = JSON.parse(JSON.stringify(docs));
+  } catch (error: any) {
+    console.error('Failed to load achievements in AdminAchievementsPage:', error);
+  }
 
   return (
     <div className="flex flex-col gap-8">

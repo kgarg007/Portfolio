@@ -5,9 +5,15 @@ import ProjectManager from './ProjectManager';
 export const revalidate = 0;
 
 export default async function AdminProjectsPage() {
-  await connectToDatabase();
-  const docs = await Project.find().sort({ displayOrder: 1, createdAt: -1 }).lean();
-  const projects = JSON.parse(JSON.stringify(docs));
+  let projects = [];
+
+  try {
+    await connectToDatabase();
+    const docs = await Project.find().sort({ displayOrder: 1, createdAt: -1 }).lean();
+    projects = JSON.parse(JSON.stringify(docs));
+  } catch (error: any) {
+    console.error('Failed to load projects in AdminProjectsPage:', error);
+  }
 
   return (
     <div className="flex flex-col gap-8">

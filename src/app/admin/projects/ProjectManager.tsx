@@ -3,15 +3,22 @@
 import { useState } from 'react';
 import { createProjectAction, updateProjectAction, deleteProjectAction, removeProjectCoverImageAction } from '@/lib/actions';
 import { IProject } from '@/types';
-import { Plus, Edit, Trash2, CheckCircle, AlertCircle, Eye, EyeOff, Star, ArrowUpRight, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, AlertCircle, Eye, EyeOff, Star, ArrowUpRight, Upload, X } from 'lucide-react';
 import Link from 'next/link';
 
 interface ProjectManagerProps {
-  initialProjects: IProject[];
+  initialProjects?: IProject[];
 }
 
-export default function ProjectManager({ initialProjects }: ProjectManagerProps) {
-  const [projects, setProjects] = useState<IProject[]>(initialProjects);
+function getCoverImageUrl(coverImage: any): string {
+  if (!coverImage) return '';
+  if (typeof coverImage === 'string') return coverImage;
+  if (typeof coverImage === 'object' && coverImage.url) return coverImage.url;
+  return '';
+}
+
+export default function ProjectManager({ initialProjects = [] }: ProjectManagerProps) {
+  const [projects, setProjects] = useState<IProject[]>(initialProjects || []);
   const [editingProject, setEditingProject] = useState<Partial<IProject> | null>(null);
   const [coverImageBase64, setCoverImageBase64] = useState<string>('');
   const [isCreating, setIsCreating] = useState(false);
@@ -58,8 +65,14 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      setError('File size must be under 10MB.');
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setError('Please upload a JPG, PNG, or WEBP image file.');
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Cover image must be smaller than 4MB.');
       return;
     }
     const reader = new FileReader();
@@ -74,7 +87,8 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
       setCoverImageBase64('');
       return;
     }
-    if (editingProject?._id && editingProject.coverImage?.url) {
+    const currentUrl = getCoverImageUrl(editingProject?.coverImage);
+    if (editingProject?._id && currentUrl) {
       setLoading(true);
       try {
         const res = await removeProjectCoverImageAction(editingProject._id);
@@ -140,6 +154,8 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
     }
   };
 
+  const currentCoverUrl = getCoverImageUrl(editingProject?.coverImage);
+
   return (
     <div className="flex flex-col gap-8 font-mono text-sm">
       {success && (
@@ -171,7 +187,7 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
       {editingProject && (
         <form onSubmit={handleSubmit} className="p-8 rounded-2xl bg-zinc-900 border border-zinc-700 flex flex-col gap-6 shadow-2xl">
           <h2 className="text-xl font-bold text-zinc-100 font-sans border-b border-zinc-800 pb-3">
-            {isCreating ? 'Create New Project' : `Edit Project: ${editingProject.name}`}
+            {isCreating ? 'Create New Project' : `Edit Project: ${editingProject.name || ''}`}
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -217,8 +233,8 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
               <label className="text-xs text-zinc-400 uppercase">Display Order (Numeric)</label>
               <input
                 type="number"
-                value={editingProject.displayOrder || 0}
-                onChange={(e) => setEditingProject({ ...editingProject, displayOrder: parseInt(e.target.value) || 0 })}
+                value={editingProject.displayOrder ?? 0}
+                onChange={(e) => setEditingProject({ ...editingProject, displayOrder: parseInt(e.target.value, 10) || 0 })}
                 className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans"
               />
             </div>
@@ -226,11 +242,11 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
 
           <div className="flex flex-col gap-2">
             <label className="text-xs text-zinc-400 uppercase">Project Cover Image / Thumbnail</label>
-            {(coverImageBase64 || editingProject.coverImage?.url) ? (
+            {(coverImageBase64 || currentCoverUrl) ? (
               <div className="flex items-center gap-4 p-4 rounded-lg bg-zinc-950 border border-zinc-800">
                 <div className="w-20 h-14 relative rounded bg-zinc-900 border border-zinc-800 overflow-hidden shrink-0 flex items-center justify-center">
                   <img
-                    src={coverImageBase64 || editingProject.coverImage?.url}
+                    src={coverImageBase64 || currentCoverUrl}
                     alt="Cover preview"
                     className="object-cover w-full h-full"
                   />
@@ -240,7 +256,7 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
                     {coverImageBase64 ? 'New Image Selected' : 'Persisted Image'}
                   </span>
                   <span className="text-zinc-500 font-mono text-[11px] truncate max-w-xs">
-                    {editingProject.coverImage?.url || 'Ready to upload'}
+                    {currentCoverUrl || 'Ready to upload'}
                   </span>
                 </div>
                 <button
@@ -365,16 +381,16 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800/60 text-xs">
-            {projects.map((proj) => (
-              <tr key={proj._id} className="hover:bg-zinc-900/40 transition-colors">
-                <td className="p-4 font-mono text-zinc-400">{proj.displayOrder}</td>
+            {projects.map((proj, idx) => (
+              <tr key={proj._id ? String(proj._id) : `proj-${idx}`} className="hover:bg-zinc-900/40 transition-colors">
+                <td className="p-4 font-mono text-zinc-400">{proj.displayOrder ?? 0}</td>
                 <td className="p-4 font-sans font-bold text-zinc-200">
                   <div className="flex items-center gap-2">
-                    {proj.name}
+                    {proj.name || 'Untitled Project'}
                     {proj.featured && <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />}
                   </div>
                 </td>
-                <td className="p-4 font-mono text-zinc-400">{proj.category}</td>
+                <td className="p-4 font-mono text-zinc-400">{proj.category || 'Web App'}</td>
                 <td className="p-4">
                   {proj.published ? (
                     <span className="inline-flex items-center gap-1 text-emerald-400 font-mono">
@@ -389,7 +405,7 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
                 <td className="p-4 text-right">
                   <div className="inline-flex items-center gap-2">
                     <Link
-                      href={`/projects/${proj.slug}`}
+                      href={proj.slug ? `/projects/${proj.slug}` : '#'}
                       target="_blank"
                       className="p-1.5 rounded bg-zinc-800 text-zinc-300 hover:text-white"
                       title="View Case Study"
@@ -404,7 +420,7 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(proj._id!)}
+                      onClick={() => handleDelete(String(proj._id))}
                       className="p-1.5 rounded bg-rose-950 border border-rose-800 text-rose-300 hover:bg-rose-900"
                       title="Delete"
                     >

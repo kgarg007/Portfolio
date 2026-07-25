@@ -63,17 +63,17 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
   )}`;
 
   return (
-    <section id="contact" className="py-20 border-t border-zinc-800/60 bg-zinc-950/40 relative">
+    <section id="contact" className="py-20 border-t border-[#202024] bg-[#101012] relative">
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
         <div className="flex flex-col gap-2 mb-12">
           <span className="font-mono text-xs text-indigo-400 font-semibold tracking-wider uppercase">
             {eyebrow}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100 max-w-2xl font-sans">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] max-w-2xl font-sans">
             {heading}
           </h2>
-          <p className="text-sm sm:text-base text-zinc-400 max-w-xl font-sans">
+          <p className="text-sm sm:text-base text-[#A1A1AA] max-w-xl font-sans">
             {description}
           </p>
           <div className="w-10 h-1 bg-indigo-500 rounded-full mt-2" />
@@ -85,14 +85,14 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
             {/* Primary Contacts */}
             <a
               href="mailto:kgarg5448@gmail.com"
-              className="flex items-center gap-4 p-4.5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group shadow-sm"
+              className="flex items-center gap-4 p-4.5 rounded-xl bg-[#161618] border border-[#202024] hover:border-white/20 hover:bg-[#1C1C20] transition-all group shadow-sm"
             >
               <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform shrink-0">
                 <Mail className="w-4 h-4" />
               </div>
               <div className="truncate">
-                <span className="text-[10px] text-zinc-500 uppercase block font-mono">Email Address</span>
-                <span className="text-zinc-200 font-sans text-sm font-medium truncate block">kgarg5448@gmail.com</span>
+                <span className="text-[10px] text-[#71717A] uppercase block font-mono">Email Address</span>
+                <span className="text-[#FAFAFA] font-sans text-sm font-medium truncate block">kgarg5448@gmail.com</span>
               </div>
             </a>
 
@@ -100,14 +100,14 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
               href="https://linkedin.com/in/krishna-garg-56117a324"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4.5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group shadow-sm"
+              className="flex items-center gap-4 p-4.5 rounded-xl bg-[#161618] border border-[#202024] hover:border-white/20 hover:bg-[#1C1C20] transition-all group shadow-sm"
             >
               <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform shrink-0">
                 <LinkedinIcon className="w-4 h-4" />
               </div>
               <div className="truncate">
-                <span className="text-[10px] text-zinc-500 uppercase block font-mono">LinkedIn</span>
-                <span className="text-zinc-200 font-sans text-sm font-medium truncate block">krishna-garg-56117a324</span>
+                <span className="text-[10px] text-[#71717A] uppercase block font-mono">LinkedIn</span>
+                <span className="text-[#FAFAFA] font-sans text-sm font-medium truncate block">krishna-garg-56117a324</span>
               </div>
             </a>
 
@@ -116,18 +116,18 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
               href="https://github.com/kgarg007"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4.5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group shadow-sm"
+              className="flex items-center gap-4 p-4.5 rounded-xl bg-[#161618] border border-[#202024] hover:border-white/20 hover:bg-[#1C1C20] transition-all group shadow-sm"
             >
-              <div className="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 group-hover:scale-110 transition-transform shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-[#101012] border border-[#202024] flex items-center justify-center text-zinc-300 group-hover:scale-110 transition-transform shrink-0">
                 <GithubIcon className="w-4 h-4" />
               </div>
               <div className="truncate">
-                <span className="text-[10px] text-zinc-500 uppercase block font-mono">GitHub Profile</span>
-                <span className="text-zinc-200 font-sans text-sm font-medium truncate block">github.com/kgarg007</span>
+                <span className="text-[10px] text-[#71717A] uppercase block font-mono">GitHub Profile</span>
+                <span className="text-[#FAFAFA] font-sans text-sm font-medium truncate block">github.com/kgarg007</span>
               </div>
             </a>
 
-            {/* WhatsApp Action Button (No Plain Phone Number Text) */}
+            {/* WhatsApp Action Button */}
             {whatsappEnabled && (
               <a
                 href={whatsappUrl}
@@ -141,8 +141,8 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
           </div>
 
           {/* Contact Form Column */}
-          <div className="lg:col-span-7 rounded-xl bg-zinc-900/60 border border-zinc-800/80 p-6 sm:p-8 shadow-md">
-            <h3 className="text-lg font-bold text-zinc-100 font-sans mb-5">
+          <div className="lg:col-span-7 rounded-xl bg-[#161618] border border-[#202024] p-6 sm:p-8 shadow-md">
+            <h3 className="text-lg font-bold text-[#FAFAFA] font-sans mb-5">
               Send a Direct Message
             </h3>
 
@@ -156,7 +156,6 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
-                {/* Honeypot field for bot protection */}
                 <input
                   type="text"
                   name="honeypot"
@@ -176,50 +175,50 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] text-zinc-400 uppercase">Your Name *</label>
+                    <label className="text-[11px] text-[#A1A1AA] uppercase">Your Name *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Alex Smith"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs"
+                      className="px-3.5 py-2.5 rounded-lg bg-[#101012] border border-[#202024] text-[#FAFAFA] placeholder-[#71717A] focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] text-zinc-400 uppercase">Your Email *</label>
+                    <label className="text-[11px] text-[#A1A1AA] uppercase">Your Email *</label>
                     <input
                       type="email"
                       required
                       placeholder="alex@example.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs"
+                      className="px-3.5 py-2.5 rounded-lg bg-[#101012] border border-[#202024] text-[#FAFAFA] placeholder-[#71717A] focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs"
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] text-zinc-400 uppercase">Subject</label>
+                  <label className="text-[11px] text-[#A1A1AA] uppercase">Subject</label>
                   <input
                     type="text"
                     placeholder="Project Inquiry / Opportunity"
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs"
+                    className="px-3.5 py-2.5 rounded-lg bg-[#101012] border border-[#202024] text-[#FAFAFA] placeholder-[#71717A] focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] text-zinc-400 uppercase">Message *</label>
+                  <label className="text-[11px] text-[#A1A1AA] uppercase">Message *</label>
                   <textarea
                     required
                     rows={4}
                     placeholder="Describe your project, role, or inquiry..."
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs resize-none"
+                    className="px-3.5 py-2.5 rounded-lg bg-[#101012] border border-[#202024] text-[#FAFAFA] placeholder-[#71717A] focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs resize-none"
                   />
                 </div>
 

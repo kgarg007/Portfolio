@@ -5,9 +5,32 @@ import SettingsForm from './SettingsForm';
 export const revalidate = 0;
 
 export default async function AdminSettingsPage() {
-  await connectToDatabase();
-  const doc = await SiteSettings.findOne().lean();
-  const settings = JSON.parse(JSON.stringify(doc || {}));
+  let settings: any = {
+    sectionVisibility: {
+      hero: true,
+      about: true,
+      projects: true,
+      experience: true,
+      skills: true,
+      achievements: true,
+      hackathons: true,
+      education: true,
+      contact: true,
+      whatsapp: true,
+    },
+    whatsappNumber: '+917982874404',
+    whatsappMessage: 'Hi Krishna, I visited your portfolio!',
+  };
+
+  try {
+    await connectToDatabase();
+    const doc = await SiteSettings.findOne().lean();
+    if (doc) {
+      settings = JSON.parse(JSON.stringify(doc));
+    }
+  } catch (error: any) {
+    console.error('Failed to load settings in AdminSettingsPage:', error);
+  }
 
   return (
     <div className="flex flex-col gap-8">

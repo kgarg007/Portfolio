@@ -108,7 +108,13 @@ export default function MediaManager({ initialMediaItems }: MediaManagerProps) {
             className="group rounded-xl bg-zinc-900/60 border border-zinc-800 p-4 flex flex-col gap-3 hover:border-zinc-700 transition-all"
           >
             <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-zinc-950 border border-zinc-800">
-              <Image src={item.url} alt={item.altText || 'Media Asset'} fill className="object-cover" />
+              <Image
+                src={item.url}
+                alt={item.altText || 'Media Asset'}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover"
+              />
             </div>
 
             <div className="flex items-center justify-between text-xs pt-1">
