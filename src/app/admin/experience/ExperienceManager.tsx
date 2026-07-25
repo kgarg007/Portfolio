@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { createExperienceAction, updateExperienceAction, deleteExperienceAction } from '@/lib/actions';
+import { createExperienceAction, updateExperienceAction, deleteExperienceAction, removeExperienceCertificateAction } from '@/lib/actions';
 import { IExperience } from '@/types';
-import { Plus, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, AlertCircle, Upload, X, FileText, ExternalLink } from 'lucide-react';
 
 interface ExperienceManagerProps {
   initialExperiences: IExperience[];
@@ -12,6 +12,8 @@ interface ExperienceManagerProps {
 export default function ExperienceManager({ initialExperiences }: ExperienceManagerProps) {
   const [experiences, setExperiences] = useState<IExperience[]>(initialExperiences);
   const [editingExp, setEditingExp] = useState<Partial<IExperience> | null>(null);
+  const [certificateBase64, setCertificateBase64] = useState<string>('');
+  const [certificateName, setCertificateName] = useState<string>('Certificate');
   const [isCreating, setIsCreating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,26 +22,73 @@ export default function ExperienceManager({ initialExperiences }: ExperienceMana
   const emptyForm: Partial<IExperience> = {
     organization: '',
     role: '',
-    location: 'New Delhi',
-    startDate: '2026',
-    endDate: 'Present',
-    isCurrent: true,
-    description: ['Developed responsive user interfaces and backend integrations.'],
-    technologies: ['React', 'Next.js', 'Tailwind CSS'],
+    location: 'Remote',
+    startDate: 'Jan 2025',
+    endDate: 'Apr 2025',
+    isCurrent: false,
+    description: ['Developed responsive user interfaces and production pages.'],
+    technologies: ['HTML5', 'CSS3', 'JavaScript'],
     published: true,
     displayOrder: 0,
   };
 
   const handleStartCreate = () => {
     setEditingExp(emptyForm);
+    setCertificateBase64('');
     setIsCreating(true);
     setError('');
   };
 
   const handleStartEdit = (exp: IExperience) => {
     setEditingExp({ ...exp });
+    setCertificateBase64('');
     setIsCreating(false);
     setError('');
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setError('Please upload a PDF, JPG, PNG, or WEBP file.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be under 10MB.');
+      return;
+    }
+
+    setCertificateName(file.name);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCertificateBase64(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveCertificate = async () => {
+    if (certificateBase64) {
+      setCertificateBase64('');
+      return;
+    }
+    if (editingExp?._id && editingExp.certificate?.url) {
+      setLoading(true);
+      try {
+        const res = await removeExperienceCertificateAction(editingExp._id);
+        if (res.success) {
+          setEditingExp((prev) => (prev ? { ...prev, certificate: { url: '', publicId: '', name: '' } } : null));
+          setExperiences((prev) => prev.map((e) => (e._id === editingExp._id ? res.experience : e)));
+          setSuccess('Certificate removed.');
+          setTimeout(() => setSuccess(''), 3000);
+        }
+      } catch (err: any) {
+        setError(err.message || 'Failed to remove certificate');
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -66,19 +115,22 @@ export default function ExperienceManager({ initialExperiences }: ExperienceMana
     setError('');
     setSuccess('');
 
+    const payload = { ...editingExp, certificateBase64, certificateName };
+
     try {
       if (isCreating) {
-        const res = await createExperienceAction(editingExp);
+        const res = await createExperienceAction(payload);
         if (!res.success) throw new Error(res.error);
         setExperiences((prev) => [...prev, res.experience]);
         setSuccess('Experience entry added successfully!');
       } else if (editingExp._id) {
-        const res = await updateExperienceAction(editingExp._id, editingExp);
+        const res = await updateExperienceAction(editingExp._id, payload);
         if (!res.success) throw new Error(res.error);
         setExperiences((prev) => prev.map((e) => (e._id === editingExp._id ? res.experience : e)));
         setSuccess('Experience entry updated successfully!');
       }
       setEditingExp(null);
+      setCertificateBase64('');
       setTimeout(() => setSuccess(''), 3500);
     } catch (err: any) {
       setError(err.message || 'Operation failed.');
@@ -143,28 +195,59 @@ export default function ExperienceManager({ initialExperiences }: ExperienceMana
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-zinc-400 uppercase">Start Date *</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. July 2025"
-                value={editingExp.startDate || ''}
-                onChange={(e) => setEditingExp({ ...editingExp, startDate: e.target.value })}
-                className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans"
-              />
+              <label className="text-xs text-zinc-400 uppercase">Start Month & Year *</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="e.g. Jan"
+                  value={editingExp.startMonth || ''}
+                  onChange={(e) => setEditingExp({ ...editingExp, startMonth: e.target.value, startDate: `${e.target.value} ${editingExp.startYear || ''}`.trim() })}
+                  className="w-1/2 px-3 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans text-xs"
+                />
+                <input
+                  type="text"
+                  placeholder="e.g. 2025"
+                  value={editingExp.startYear || ''}
+                  onChange={(e) => setEditingExp({ ...editingExp, startYear: e.target.value, startDate: `${editingExp.startMonth || ''} ${e.target.value}`.trim() })}
+                  className="w-1/2 px-3 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans text-xs"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-zinc-400 uppercase">End Date</label>
-              <input
-                type="text"
-                placeholder="e.g. Present"
-                value={editingExp.endDate || ''}
-                onChange={(e) => setEditingExp({ ...editingExp, endDate: e.target.value })}
-                className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans"
-              />
+              <label className="text-xs text-zinc-400 uppercase">End Month & Year</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  disabled={editingExp.isCurrent}
+                  placeholder="e.g. Apr"
+                  value={editingExp.endMonth || ''}
+                  onChange={(e) => setEditingExp({ ...editingExp, endMonth: e.target.value, endDate: `${e.target.value} ${editingExp.endYear || ''}`.trim() })}
+                  className="w-1/2 px-3 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans text-xs disabled:opacity-40"
+                />
+                <input
+                  type="text"
+                  disabled={editingExp.isCurrent}
+                  placeholder="e.g. 2025"
+                  value={editingExp.endYear || ''}
+                  onChange={(e) => setEditingExp({ ...editingExp, endYear: e.target.value, endDate: `${editingExp.endMonth || ''} ${e.target.value}`.trim() })}
+                  className="w-1/2 px-3 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans text-xs disabled:opacity-40"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col justify-end pb-2">
+              <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-300 font-sans">
+                <input
+                  type="checkbox"
+                  checked={editingExp.isCurrent || false}
+                  onChange={(e) => setEditingExp({ ...editingExp, isCurrent: e.target.checked })}
+                  className="w-4 h-4 rounded bg-zinc-950 border-zinc-800 text-indigo-600 focus:ring-0"
+                />
+                <span>Currently Working Here (Present)</span>
+              </label>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -182,11 +265,66 @@ export default function ExperienceManager({ initialExperiences }: ExperienceMana
             <label className="text-xs text-zinc-400 uppercase">Description Bullet Points (One per line) *</label>
             <textarea
               required
-              rows={4}
+              rows={3}
               value={editingExp.description?.join('\n') || ''}
               onChange={(e) => setEditingExp({ ...editingExp, description: e.target.value.split('\n').filter(Boolean) })}
               className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans text-xs resize-y"
             />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-xs text-zinc-400 uppercase">Technologies / Skills (Comma-separated)</label>
+            <input
+              type="text"
+              placeholder="HTML, CSS, JavaScript, React"
+              value={editingExp.technologies?.join(', ') || ''}
+              onChange={(e) => setEditingExp({ ...editingExp, technologies: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
+              className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-mono text-xs"
+            />
+          </div>
+
+          {/* Certificate Upload Field */}
+          <div className="flex flex-col gap-2">
+            <label className="text-xs text-zinc-400 uppercase">Experience Certificate (Optional PDF/JPG/PNG/WEBP)</label>
+            {(certificateBase64 || editingExp.certificate?.url) ? (
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-zinc-950 border border-zinc-800">
+                <FileText className="w-6 h-6 text-indigo-400 shrink-0" />
+                <div className="flex flex-col gap-1 text-xs">
+                  <span className="text-zinc-200 font-semibold">
+                    {certificateBase64 ? certificateName : editingExp.certificate?.name || 'Certificate'}
+                  </span>
+                  {editingExp.certificate?.url && (
+                    <a
+                      href={editingExp.certificate.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-400 hover:underline flex items-center gap-1 text-[11px]"
+                    >
+                      Preview Persisted Certificate <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveCertificate}
+                  className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-rose-950 border border-rose-800 text-rose-300 hover:bg-rose-900 text-xs font-mono"
+                >
+                  <X className="w-3.5 h-3.5" /> Remove
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-zinc-800 rounded-lg hover:border-zinc-700 bg-zinc-950 cursor-pointer text-zinc-400 transition-colors">
+                <Upload className="w-6 h-6 mb-2 text-indigo-400" />
+                <span className="text-xs font-sans font-medium text-zinc-300">Click to upload certificate</span>
+                <span className="text-[11px] font-mono text-zinc-500 mt-1">Supports PDF, JPG, PNG, WEBP (Max 10MB)</span>
+                <input
+                  type="file"
+                  accept="application/pdf, image/jpeg, image/png, image/webp"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800">

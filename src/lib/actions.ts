@@ -131,39 +131,95 @@ export async function createProjectAction(data: any) {
   await verifyAdminAuthorization();
   await connectToDatabase();
 
+  let newUploadedAsset: { url: string; publicId: string } | null = null;
+  if (data.coverImageBase64) {
+    const uploaded = await uploadToCloudinary(data.coverImageBase64, 'projects', 'image');
+    if (!uploaded?.url || !uploaded?.publicId) {
+      return { success: false, error: 'Failed to upload project cover image.' };
+    }
+    newUploadedAsset = uploaded;
+    data.coverImage = { url: uploaded.url, publicId: uploaded.publicId, altText: data.name || '' };
+    delete data.coverImageBase64;
+  }
+
   const parsed = ProjectSchema.safeParse(data);
   if (!parsed.success) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'image');
+    }
     return { success: false, error: parsed.error.issues[0].message };
   }
 
   const existingSlug = await Project.findOne({ slug: parsed.data.slug });
   if (existingSlug) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'image');
+    }
     return { success: false, error: 'A project with this slug already exists.' };
   }
 
-  const project = await Project.create(parsed.data);
-  revalidatePath('/');
-  revalidatePath('/projects');
-  revalidatePath(`/projects/${project.slug}`);
-  revalidatePath('/admin/projects');
-  return { success: true, project: JSON.parse(JSON.stringify(project)) };
+  try {
+    const project = await Project.create(parsed.data);
+    revalidatePath('/');
+    revalidatePath('/projects');
+    revalidatePath(`/projects/${project.slug}`);
+    revalidatePath('/admin/projects');
+    return { success: true, project: JSON.parse(JSON.stringify(project)) };
+  } catch (err: any) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'image');
+    }
+    return { success: false, error: err.message || 'Failed to create project.' };
+  }
 }
 
 export async function updateProjectAction(id: string, data: any) {
   await verifyAdminAuthorization();
   await connectToDatabase();
 
+  const existingProject = await Project.findById(id);
+  if (!existingProject) {
+    return { success: false, error: 'Project not found.' };
+  }
+
+  let newUploadedAsset: { url: string; publicId: string } | null = null;
+  if (data.coverImageBase64) {
+    const uploaded = await uploadToCloudinary(data.coverImageBase64, 'projects', 'image');
+    if (!uploaded?.url || !uploaded?.publicId) {
+      return { success: false, error: 'Failed to upload new cover image.' };
+    }
+    newUploadedAsset = uploaded;
+    data.coverImage = { url: uploaded.url, publicId: uploaded.publicId, altText: data.name || existingProject.name };
+    delete data.coverImageBase64;
+  }
+
   const parsed = ProjectSchema.safeParse(data);
   if (!parsed.success) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'image');
+    }
     return { success: false, error: parsed.error.issues[0].message };
   }
 
-  const updated = await Project.findByIdAndUpdate(id, parsed.data, { new: true });
-  revalidatePath('/');
-  revalidatePath('/projects');
-  if (updated?.slug) revalidatePath(`/projects/${updated.slug}`);
-  revalidatePath('/admin/projects');
-  return { success: true, project: JSON.parse(JSON.stringify(updated)) };
+  try {
+    const updated = await Project.findByIdAndUpdate(id, parsed.data, { new: true });
+    
+    // ONLY NOW delete old Cloudinary image after DB update succeeds
+    if (newUploadedAsset && existingProject.coverImage?.publicId && existingProject.coverImage.publicId !== newUploadedAsset.publicId) {
+      await deleteFromCloudinary(existingProject.coverImage.publicId, 'image');
+    }
+
+    revalidatePath('/');
+    revalidatePath('/projects');
+    if (updated?.slug) revalidatePath(`/projects/${updated.slug}`);
+    revalidatePath('/admin/projects');
+    return { success: true, project: JSON.parse(JSON.stringify(updated)) };
+  } catch (err: any) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'image');
+    }
+    return { success: false, error: err.message || 'Failed to update project.' };
+  }
 }
 
 export async function deleteProjectAction(id: string) {
@@ -172,11 +228,11 @@ export async function deleteProjectAction(id: string) {
 
   const project = await Project.findById(id);
   if (project?.coverImage?.publicId) {
-    await deleteFromCloudinary(project.coverImage.publicId);
+    await deleteFromCloudinary(project.coverImage.publicId, 'image');
   }
   if (project?.gallery?.length) {
     for (const img of project.gallery) {
-      if (img.publicId) await deleteFromCloudinary(img.publicId);
+      if (img.publicId) await deleteFromCloudinary(img.publicId, 'image');
     }
   }
 
@@ -194,40 +250,164 @@ export async function createExperienceAction(data: any) {
   await verifyAdminAuthorization();
   await connectToDatabase();
 
+  let newUploadedAsset: { url: string; publicId: string } | null = null;
+  if (data.certificateBase64) {
+    const resourceType = data.certificateBase64.startsWith('data:application/pdf') ? 'raw' : 'auto';
+    const uploaded = await uploadToCloudinary(data.certificateBase64, 'certificates', resourceType);
+    if (!uploaded?.url || !uploaded?.publicId) {
+      return { success: false, error: 'Failed to upload experience certificate.' };
+    }
+    newUploadedAsset = uploaded;
+    data.certificate = { url: uploaded.url, publicId: uploaded.publicId, name: data.certificateName || 'Certificate' };
+    delete data.certificateBase64;
+    delete data.certificateName;
+  }
+
   const parsed = ExperienceSchema.safeParse(data);
   if (!parsed.success) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'auto');
+    }
     return { success: false, error: parsed.error.issues[0].message };
   }
 
-  const exp = await Experience.create(parsed.data);
-  revalidatePath('/');
-  revalidatePath('/admin/experience');
-  return { success: true, experience: JSON.parse(JSON.stringify(exp)) };
+  try {
+    const exp = await Experience.create(parsed.data);
+    revalidatePath('/');
+    revalidatePath('/admin/experience');
+    return { success: true, experience: JSON.parse(JSON.stringify(exp)) };
+  } catch (err: any) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'auto');
+    }
+    return { success: false, error: err.message || 'Failed to create experience.' };
+  }
 }
 
 export async function updateExperienceAction(id: string, data: any) {
   await verifyAdminAuthorization();
   await connectToDatabase();
 
+  const existingExp = await Experience.findById(id);
+  if (!existingExp) {
+    return { success: false, error: 'Experience entry not found.' };
+  }
+
+  let newUploadedAsset: { url: string; publicId: string } | null = null;
+  if (data.certificateBase64) {
+    const resourceType = data.certificateBase64.startsWith('data:application/pdf') ? 'raw' : 'auto';
+    const uploaded = await uploadToCloudinary(data.certificateBase64, 'certificates', resourceType);
+    if (!uploaded?.url || !uploaded?.publicId) {
+      return { success: false, error: 'Failed to upload replacement certificate.' };
+    }
+    newUploadedAsset = uploaded;
+    data.certificate = { url: uploaded.url, publicId: uploaded.publicId, name: data.certificateName || 'Certificate' };
+    delete data.certificateBase64;
+    delete data.certificateName;
+  }
+
   const parsed = ExperienceSchema.safeParse(data);
   if (!parsed.success) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'auto');
+    }
     return { success: false, error: parsed.error.issues[0].message };
   }
 
-  const updated = await Experience.findByIdAndUpdate(id, parsed.data, { new: true });
-  revalidatePath('/');
-  revalidatePath('/admin/experience');
-  return { success: true, experience: JSON.parse(JSON.stringify(updated)) };
+  try {
+    const updated = await Experience.findByIdAndUpdate(id, parsed.data, { new: true });
+
+    // ONLY NOW delete old Cloudinary asset after DB update succeeds
+    if (newUploadedAsset && existingExp.certificate?.publicId && existingExp.certificate.publicId !== newUploadedAsset.publicId) {
+      await deleteFromCloudinary(existingExp.certificate.publicId, 'auto');
+    }
+
+    revalidatePath('/');
+    revalidatePath('/admin/experience');
+    return { success: true, experience: JSON.parse(JSON.stringify(updated)) };
+  } catch (err: any) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'auto');
+    }
+    return { success: false, error: err.message || 'Failed to update experience.' };
+  }
 }
 
 export async function deleteExperienceAction(id: string) {
   await verifyAdminAuthorization();
   await connectToDatabase();
 
+  const exp = await Experience.findById(id);
+  if (exp?.certificate?.publicId) {
+    await deleteFromCloudinary(exp.certificate.publicId, 'auto');
+  }
+
   await Experience.findByIdAndDelete(id);
   revalidatePath('/');
   revalidatePath('/admin/experience');
   return { success: true };
+}
+
+export async function removeExperienceCertificateAction(id: string) {
+  await verifyAdminAuthorization();
+  await connectToDatabase();
+
+  const exp = await Experience.findById(id);
+  if (exp?.certificate?.publicId) {
+    await deleteFromCloudinary(exp.certificate.publicId, 'auto');
+  }
+
+  const updated = await Experience.findByIdAndUpdate(
+    id,
+    { certificate: { url: '', publicId: '', name: '' } },
+    { new: true }
+  );
+
+  revalidatePath('/');
+  revalidatePath('/admin/experience');
+  return { success: true, experience: JSON.parse(JSON.stringify(updated)) };
+}
+
+export async function removeAchievementCertificateAction(id: string) {
+  await verifyAdminAuthorization();
+  await connectToDatabase();
+
+  const ach = await Achievement.findById(id);
+  if (ach?.certificate?.publicId) {
+    await deleteFromCloudinary(ach.certificate.publicId, 'auto');
+  }
+
+  const updated = await Achievement.findByIdAndUpdate(
+    id,
+    { certificate: { url: '', publicId: '', name: '' } },
+    { new: true }
+  );
+
+  revalidatePath('/');
+  revalidatePath('/admin/achievements');
+  return { success: true, achievement: JSON.parse(JSON.stringify(updated)) };
+}
+
+export async function removeProjectCoverImageAction(id: string) {
+  await verifyAdminAuthorization();
+  await connectToDatabase();
+
+  const project = await Project.findById(id);
+  if (project?.coverImage?.publicId) {
+    await deleteFromCloudinary(project.coverImage.publicId, 'image');
+  }
+
+  const updated = await Project.findByIdAndUpdate(
+    id,
+    { coverImage: { url: '', publicId: '', altText: '' } },
+    { new: true }
+  );
+
+  revalidatePath('/');
+  revalidatePath('/projects');
+  if (updated?.slug) revalidatePath(`/projects/${updated.slug}`);
+  revalidatePath('/admin/projects');
+  return { success: true, project: JSON.parse(JSON.stringify(updated)) };
 }
 
 // ==========================================
@@ -323,35 +503,97 @@ export async function createAchievementAction(data: any) {
   await verifyAdminAuthorization();
   await connectToDatabase();
 
+  let newUploadedAsset: { url: string; publicId: string } | null = null;
+  if (data.certificateBase64) {
+    const resourceType = data.certificateBase64.startsWith('data:application/pdf') ? 'raw' : 'auto';
+    const uploaded = await uploadToCloudinary(data.certificateBase64, 'achievements', resourceType);
+    if (!uploaded?.url || !uploaded?.publicId) {
+      return { success: false, error: 'Failed to upload achievement proof/certificate.' };
+    }
+    newUploadedAsset = uploaded;
+    data.certificate = { url: uploaded.url, publicId: uploaded.publicId, name: data.certificateName || 'Proof' };
+    delete data.certificateBase64;
+    delete data.certificateName;
+  }
+
   const parsed = AchievementSchema.safeParse(data);
   if (!parsed.success) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'auto');
+    }
     return { success: false, error: parsed.error.issues[0].message };
   }
 
-  const ach = await Achievement.create(parsed.data);
-  revalidatePath('/');
-  revalidatePath('/admin/achievements');
-  return { success: true, achievement: JSON.parse(JSON.stringify(ach)) };
+  try {
+    const ach = await Achievement.create(parsed.data);
+    revalidatePath('/');
+    revalidatePath('/admin/achievements');
+    return { success: true, achievement: JSON.parse(JSON.stringify(ach)) };
+  } catch (err: any) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'auto');
+    }
+    return { success: false, error: err.message || 'Failed to create achievement.' };
+  }
 }
 
 export async function updateAchievementAction(id: string, data: any) {
   await verifyAdminAuthorization();
   await connectToDatabase();
 
+  const existingAch = await Achievement.findById(id);
+  if (!existingAch) {
+    return { success: false, error: 'Achievement not found.' };
+  }
+
+  let newUploadedAsset: { url: string; publicId: string } | null = null;
+  if (data.certificateBase64) {
+    const resourceType = data.certificateBase64.startsWith('data:application/pdf') ? 'raw' : 'auto';
+    const uploaded = await uploadToCloudinary(data.certificateBase64, 'achievements', resourceType);
+    if (!uploaded?.url || !uploaded?.publicId) {
+      return { success: false, error: 'Failed to upload replacement proof.' };
+    }
+    newUploadedAsset = uploaded;
+    data.certificate = { url: uploaded.url, publicId: uploaded.publicId, name: data.certificateName || 'Proof' };
+    delete data.certificateBase64;
+    delete data.certificateName;
+  }
+
   const parsed = AchievementSchema.safeParse(data);
   if (!parsed.success) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'auto');
+    }
     return { success: false, error: parsed.error.issues[0].message };
   }
 
-  const updated = await Achievement.findByIdAndUpdate(id, parsed.data, { new: true });
-  revalidatePath('/');
-  revalidatePath('/admin/achievements');
-  return { success: true, achievement: JSON.parse(JSON.stringify(updated)) };
+  try {
+    const updated = await Achievement.findByIdAndUpdate(id, parsed.data, { new: true });
+
+    // ONLY NOW delete old Cloudinary asset after DB update succeeds
+    if (newUploadedAsset && existingAch.certificate?.publicId && existingAch.certificate.publicId !== newUploadedAsset.publicId) {
+      await deleteFromCloudinary(existingAch.certificate.publicId, 'auto');
+    }
+
+    revalidatePath('/');
+    revalidatePath('/admin/achievements');
+    return { success: true, achievement: JSON.parse(JSON.stringify(updated)) };
+  } catch (err: any) {
+    if (newUploadedAsset) {
+      await deleteFromCloudinary(newUploadedAsset.publicId, 'auto');
+    }
+    return { success: false, error: err.message || 'Failed to update achievement.' };
+  }
 }
 
 export async function deleteAchievementAction(id: string) {
   await verifyAdminAuthorization();
   await connectToDatabase();
+
+  const ach = await Achievement.findById(id);
+  if (ach?.certificate?.publicId) {
+    await deleteFromCloudinary(ach.certificate.publicId, 'auto');
+  }
 
   await Achievement.findByIdAndDelete(id);
   revalidatePath('/');

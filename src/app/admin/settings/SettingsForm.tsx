@@ -146,6 +146,40 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
         </div>
       </div>
 
+      {/* 2b. Currently Building Settings */}
+      <div className="p-6 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-col gap-6">
+        <div className="flex items-center gap-2 border-b border-zinc-800 pb-3">
+          <Sliders className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-base font-bold text-zinc-100 font-sans">
+            Currently Building Status (Hero Pill)
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="flex flex-col gap-2">
+            <label className="text-xs text-zinc-400 uppercase">Currently Building Title / Project Name</label>
+            <input
+              type="text"
+              placeholder="e.g. Swasti Foundation MVP"
+              value={settings.currentlyBuilding || ''}
+              onChange={(e) => setSettings({ ...settings, currentlyBuilding: e.target.value })}
+              className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-xs text-zinc-400 uppercase">Project Link URL (Optional)</label>
+            <input
+              type="url"
+              placeholder="https://..."
+              value={settings.currentlyBuildingUrl || ''}
+              onChange={(e) => setSettings({ ...settings, currentlyBuildingUrl: e.target.value })}
+              className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* 3. SEO Settings */}
       <div className="p-6 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-col gap-6">
         <h2 className="text-base font-bold text-zinc-100 font-sans border-b border-zinc-800 pb-3">

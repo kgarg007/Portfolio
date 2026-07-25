@@ -47,8 +47,8 @@ export default async function HomePage() {
       <Navbar logoText={logoText} items={navigationItems} settings={settings} />
 
       <main>
-        {visibility.hero && <HeroSection content={content} settings={settings} />}
-        {visibility.about && <AboutSection content={content} settings={settings} />}
+        {visibility.hero && <HeroSection content={content} settings={settings} education={education} />}
+        {visibility.about && <AboutSection content={content} settings={settings} education={education} />}
         {visibility.projects && <ProjectsSection content={content} projects={projects} />}
         {visibility.experience && <ExperienceSection content={content} experiences={experiences} />}
         {visibility.skills && <SkillsSection content={content} skills={skills} />}

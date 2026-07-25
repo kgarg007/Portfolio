@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { createProjectAction, updateProjectAction, deleteProjectAction } from '@/lib/actions';
+import { createProjectAction, updateProjectAction, deleteProjectAction, removeProjectCoverImageAction } from '@/lib/actions';
 import { IProject } from '@/types';
-import { Plus, Edit, Trash2, CheckCircle, AlertCircle, Eye, EyeOff, Star, ArrowUpRight } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, AlertCircle, Eye, EyeOff, Star, ArrowUpRight, Upload, X, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 
 interface ProjectManagerProps {
@@ -13,6 +13,7 @@ interface ProjectManagerProps {
 export default function ProjectManager({ initialProjects }: ProjectManagerProps) {
   const [projects, setProjects] = useState<IProject[]>(initialProjects);
   const [editingProject, setEditingProject] = useState<Partial<IProject> | null>(null);
+  const [coverImageBase64, setCoverImageBase64] = useState<string>('');
   const [isCreating, setIsCreating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,6 +30,9 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
     role: 'Full Stack Developer',
     features: ['Responsive UI', 'REST API Integration'],
     techStack: ['React', 'Next.js', 'Tailwind CSS'],
+    challenges: '',
+    outcome: '',
+    technicalDecisions: '',
     githubUrl: '',
     liveUrl: '',
     startDate: '2026',
@@ -39,14 +43,53 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
 
   const handleStartCreate = () => {
     setEditingProject(emptyForm);
+    setCoverImageBase64('');
     setIsCreating(true);
     setError('');
   };
 
   const handleStartEdit = (proj: IProject) => {
     setEditingProject({ ...proj });
+    setCoverImageBase64('');
     setIsCreating(false);
     setError('');
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be under 10MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCoverImageBase64(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveCoverImage = async () => {
+    if (coverImageBase64) {
+      setCoverImageBase64('');
+      return;
+    }
+    if (editingProject?._id && editingProject.coverImage?.url) {
+      setLoading(true);
+      try {
+        const res = await removeProjectCoverImageAction(editingProject._id);
+        if (res.success) {
+          setEditingProject((prev) => (prev ? { ...prev, coverImage: { url: '', publicId: '', altText: '' } } : null));
+          setProjects((prev) => prev.map((p) => (p._id === editingProject._id ? res.project : p)));
+          setSuccess('Cover image removed.');
+          setTimeout(() => setSuccess(''), 3000);
+        }
+      } catch (err: any) {
+        setError(err.message || 'Failed to remove image');
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -73,19 +116,22 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
     setError('');
     setSuccess('');
 
+    const payload = { ...editingProject, coverImageBase64 };
+
     try {
       if (isCreating) {
-        const res = await createProjectAction(editingProject);
+        const res = await createProjectAction(payload);
         if (!res.success) throw new Error(res.error);
         setProjects((prev) => [...prev, res.project]);
         setSuccess('New project created successfully!');
       } else if (editingProject._id) {
-        const res = await updateProjectAction(editingProject._id, editingProject);
+        const res = await updateProjectAction(editingProject._id, payload);
         if (!res.success) throw new Error(res.error);
         setProjects((prev) => prev.map((p) => (p._id === editingProject._id ? res.project : p)));
         setSuccess('Project updated successfully!');
       }
       setEditingProject(null);
+      setCoverImageBase64('');
       setTimeout(() => setSuccess(''), 3500);
     } catch (err: any) {
       setError(err.message || 'Operation failed.');
@@ -176,6 +222,48 @@ export default function ProjectManager({ initialProjects }: ProjectManagerProps)
                 className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans"
               />
             </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-xs text-zinc-400 uppercase">Project Cover Image / Thumbnail</label>
+            {(coverImageBase64 || editingProject.coverImage?.url) ? (
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-zinc-950 border border-zinc-800">
+                <div className="w-20 h-14 relative rounded bg-zinc-900 border border-zinc-800 overflow-hidden shrink-0 flex items-center justify-center">
+                  <img
+                    src={coverImageBase64 || editingProject.coverImage?.url}
+                    alt="Cover preview"
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <div className="flex flex-col gap-1 text-xs">
+                  <span className="text-zinc-200 font-semibold">
+                    {coverImageBase64 ? 'New Image Selected' : 'Persisted Image'}
+                  </span>
+                  <span className="text-zinc-500 font-mono text-[11px] truncate max-w-xs">
+                    {editingProject.coverImage?.url || 'Ready to upload'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveCoverImage}
+                  className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-rose-950 border border-rose-800 text-rose-300 hover:bg-rose-900 text-xs font-mono"
+                >
+                  <X className="w-3.5 h-3.5" /> Remove Image
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-zinc-800 rounded-lg hover:border-zinc-700 bg-zinc-950 cursor-pointer text-zinc-400 transition-colors">
+                <Upload className="w-6 h-6 mb-2 text-indigo-400" />
+                <span className="text-xs font-sans font-medium text-zinc-300">Click to upload cover image</span>
+                <span className="text-[11px] font-mono text-zinc-500 mt-1">Supports PNG, JPG, WEBP (Max 10MB)</span>
+                <input
+                  type="file"
+                  accept="image/png, image/jpeg, image/webp"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">

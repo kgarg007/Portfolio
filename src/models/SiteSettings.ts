@@ -19,6 +19,8 @@ const SiteSettingsSchema = new Schema<ISiteSettingsDoc>(
     },
     whatsappNumber: { type: String, default: '+917982874404' },
     whatsappMessage: { type: String, default: 'Hi Krishna, I visited your portfolio!' },
+    currentlyBuilding: { type: String, default: '' },
+    currentlyBuildingUrl: { type: String, default: '' },
     profilePhoto: {
       url: { type: String, default: '' },
       publicId: { type: String, default: '' },

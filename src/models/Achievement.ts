@@ -13,6 +13,11 @@ const AchievementSchema = new Schema<IAchievementDoc>(
     description: { type: String, default: '' },
     certificateUrl: { type: String, default: '' },
     imageUrl: { type: String, default: '' },
+    certificate: {
+      url: { type: String, default: '' },
+      publicId: { type: String, default: '' },
+      name: { type: String, default: '' },
+    },
     featured: { type: Boolean, default: true, index: true },
     visible: { type: Boolean, default: true, index: true },
     displayOrder: { type: Number, default: 0, index: true },

@@ -113,7 +113,7 @@ export default function SkillManager({ initialSkills }: SkillManagerProps) {
             {isCreating ? 'Add New Skill Tag' : `Edit Skill: ${editingSkill.name}`}
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-5">
             <div className="flex flex-col gap-2">
               <label className="text-xs text-zinc-400 uppercase">Skill Name *</label>
               <input
@@ -137,6 +137,21 @@ export default function SkillManager({ initialSkills }: SkillManagerProps) {
                 <option value="Data Analysis">Data Analysis</option>
                 <option value="Tools & Soft Skills">Tools & Soft Skills</option>
                 <option value="Backend">Backend</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xs text-zinc-400 uppercase">Proficiency Level</label>
+              <select
+                value={editingSkill.level || ''}
+                onChange={(e) => setEditingSkill({ ...editingSkill, level: e.target.value })}
+                className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans"
+              >
+                <option value="">(None / General)</option>
+                <option value="Core">Core</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Familiar">Familiar</option>
+                <option value="Learning">Learning</option>
               </select>
             </div>
 

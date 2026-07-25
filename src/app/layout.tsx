@@ -15,15 +15,23 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Krishna Garg — Full Stack Developer & Data Analyst',
   description:
-    'Official portfolio of Krishna Garg, B.Tech CSE student at GGSIPU (MSIT, New Delhi) with CGPA 9.4. Full Stack Web Developer and Data Analyst.',
+    'Portfolio & engineering case studies of Krishna Garg, Full Stack Developer and Computer Science student at MSIT (GGSIPU).',
   keywords: ['Krishna Garg', 'Full Stack Developer', 'React', 'Next.js', 'Data Analyst', 'GGSIPU', 'MSIT'],
   authors: [{ name: 'Krishna Garg' }],
   creator: 'Krishna Garg',
   openGraph: {
     title: 'Krishna Garg — Full Stack Developer & Data Analyst',
     description:
-      'Personal portfolio & engineering case studies of Krishna Garg, Full Stack Developer and CSE student at GGSIPU (MSIT).',
+      'Portfolio & engineering case studies of Krishna Garg, Full Stack Developer and Computer Science student at MSIT (GGSIPU).',
     type: 'website',
+    url: 'https://krishnagarg.dev',
+    siteName: 'Krishna Garg Portfolio',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Krishna Garg — Full Stack Developer & Data Analyst',
+    description:
+      'Portfolio & engineering case studies of Krishna Garg, Full Stack Developer and Computer Science student at MSIT (GGSIPU).',
   },
 };
 

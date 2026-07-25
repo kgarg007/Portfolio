@@ -1,7 +1,7 @@
 import React from 'react';
 import { ISocialLink } from '@/types';
 import { GithubIcon, LinkedinIcon, LeetCodeIcon } from '@/components/ui/Icons';
-import { Mail, Phone, Globe } from 'lucide-react';
+import { Mail, MessageCircle, Globe } from 'lucide-react';
 
 interface FooterProps {
   content: Record<string, string>;
@@ -10,13 +10,13 @@ interface FooterProps {
 
 export default function Footer({ content, socialLinks = [] }: FooterProps) {
   const logoText = content.navbar_logo || 'KG.';
-  const subtext = content.footer_subtext || 'Building products, learning continuously.';
+  const subtext = content.footer_subtext || 'Building applications, learning continuously.';
   const footerCopy = content.footer_copy || 'Designed & Built by Krishna Garg';
-  const copyright = content.footer_copyright || '© 2026';
+  const copyright = content.footer_copyright || `© ${new Date().getFullYear()}`;
 
-  // Filter visible social links that have a valid URL and sort by display order
+  // Filter visible social links that have a valid URL and filter out raw phone entries
   const visibleSocials = socialLinks
-    .filter((link) => link.visible !== false && link.url && link.url.trim() !== '')
+    .filter((link) => link.visible !== false && link.url && link.url.trim() !== '' && !link.platform.toLowerCase().includes('phone number'))
     .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
   // Helper to resolve icon component based on platform name
@@ -26,7 +26,7 @@ export default function Footer({ content, socialLinks = [] }: FooterProps) {
     if (p.includes('linkedin')) return <LinkedinIcon className="w-4 h-4" />;
     if (p.includes('leetcode')) return <LeetCodeIcon className="w-4 h-4" />;
     if (p.includes('mail') || p.includes('email')) return <Mail className="w-4 h-4" />;
-    if (p.includes('phone') || p.includes('whatsapp')) return <Phone className="w-4 h-4" />;
+    if (p.includes('whatsapp')) return <MessageCircle className="w-4 h-4 text-emerald-400" />;
     return <Globe className="w-4 h-4" />;
   };
 
@@ -35,7 +35,7 @@ export default function Footer({ content, socialLinks = [] }: FooterProps) {
       <div className="max-w-6xl mx-auto px-6 flex flex-col gap-8">
         {/* Main Content Row */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          {/* Left Side — Logo & Short Developer Closing Sentence */}
+          {/* Left Side — Logo & Short Closing Sentence */}
           <div className="flex flex-col gap-1.5">
             <span className="font-bold text-xl text-zinc-100 tracking-tight font-sans">
               {logoText}
@@ -48,19 +48,22 @@ export default function Footer({ content, socialLinks = [] }: FooterProps) {
           {/* Right Side — Compact Clickable Brand Icons Only */}
           {visibleSocials.length > 0 && (
             <div className="flex items-center gap-2.5">
-              {visibleSocials.map((link) => (
-                <a
-                  key={link._id || link.platform}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={link.label || link.platform}
-                  title={link.label || link.platform}
-                  className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 hover:bg-zinc-800 hover:-translate-y-0.5 transition-all"
-                >
-                  {renderSocialIcon(link.platform)}
-                </a>
-              ))}
+              {visibleSocials.map((link) => {
+                const label = link.platform.toLowerCase().includes('whatsapp') ? 'WhatsApp' : (link.label || link.platform);
+                return (
+                  <a
+                    key={link._id || link.platform}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    title={label}
+                    className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 hover:bg-zinc-800 transition-all"
+                  >
+                    {renderSocialIcon(link.platform)}
+                  </a>
+                );
+              })}
             </div>
           )}
         </div>

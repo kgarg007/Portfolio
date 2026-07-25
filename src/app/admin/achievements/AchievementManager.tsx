@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { createAchievementAction, updateAchievementAction, deleteAchievementAction } from '@/lib/actions';
+import { createAchievementAction, updateAchievementAction, deleteAchievementAction, removeAchievementCertificateAction } from '@/lib/actions';
 import { IAchievement } from '@/types';
-import { Plus, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, AlertCircle, Upload, X, FileText, ExternalLink } from 'lucide-react';
 
 interface AchievementManagerProps {
   initialAchievements: IAchievement[];
@@ -12,6 +12,8 @@ interface AchievementManagerProps {
 export default function AchievementManager({ initialAchievements }: AchievementManagerProps) {
   const [achievements, setAchievements] = useState<IAchievement[]>(initialAchievements);
   const [editingAch, setEditingAch] = useState<Partial<IAchievement> | null>(null);
+  const [certificateBase64, setCertificateBase64] = useState<string>('');
+  const [certificateName, setCertificateName] = useState<string>('Proof Certificate');
   const [isCreating, setIsCreating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,14 +33,61 @@ export default function AchievementManager({ initialAchievements }: AchievementM
 
   const handleStartCreate = () => {
     setEditingAch(emptyForm);
+    setCertificateBase64('');
     setIsCreating(true);
     setError('');
   };
 
   const handleStartEdit = (ach: IAchievement) => {
     setEditingAch({ ...ach });
+    setCertificateBase64('');
     setIsCreating(false);
     setError('');
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setError('Please upload a PDF, JPG, PNG, or WEBP file.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be under 10MB.');
+      return;
+    }
+
+    setCertificateName(file.name);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCertificateBase64(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveCertificate = async () => {
+    if (certificateBase64) {
+      setCertificateBase64('');
+      return;
+    }
+    if (editingAch?._id && editingAch.certificate?.url) {
+      setLoading(true);
+      try {
+        const res = await removeAchievementCertificateAction(editingAch._id);
+        if (res.success) {
+          setEditingAch((prev) => (prev ? { ...prev, certificate: { url: '', publicId: '', name: '' } } : null));
+          setAchievements((prev) => prev.map((a) => (a._id === editingAch._id ? res.achievement : a)));
+          setSuccess('Proof certificate removed.');
+          setTimeout(() => setSuccess(''), 3000);
+        }
+      } catch (err: any) {
+        setError(err.message || 'Failed to remove proof certificate');
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -65,19 +114,22 @@ export default function AchievementManager({ initialAchievements }: AchievementM
     setError('');
     setSuccess('');
 
+    const payload = { ...editingAch, certificateBase64, certificateName };
+
     try {
       if (isCreating) {
-        const res = await createAchievementAction(editingAch);
+        const res = await createAchievementAction(payload);
         if (!res.success) throw new Error(res.error);
         setAchievements((prev) => [...prev, res.achievement]);
         setSuccess('Achievement added!');
       } else if (editingAch._id) {
-        const res = await updateAchievementAction(editingAch._id, editingAch);
+        const res = await updateAchievementAction(editingAch._id, payload);
         if (!res.success) throw new Error(res.error);
         setAchievements((prev) => prev.map((a) => (a._id === editingAch._id ? res.achievement : a)));
         setSuccess('Achievement updated!');
       }
       setEditingAch(null);
+      setCertificateBase64('');
       setTimeout(() => setSuccess(''), 3500);
     } catch (err: any) {
       setError(err.message || 'Operation failed.');
@@ -172,6 +224,61 @@ export default function AchievementManager({ initialAchievements }: AchievementM
                 className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans"
               />
             </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-xs text-zinc-400 uppercase">Short Context / Description</label>
+            <input
+              type="text"
+              placeholder="e.g. Secured 4th Rank among 100+ participating teams."
+              value={editingAch.description || ''}
+              onChange={(e) => setEditingAch({ ...editingAch, description: e.target.value })}
+              className="px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 font-sans text-xs"
+            />
+          </div>
+
+          {/* Certificate / Proof Upload Field */}
+          <div className="flex flex-col gap-2">
+            <label className="text-xs text-zinc-400 uppercase">Certificate / Proof (Optional PDF/JPG/PNG/WEBP)</label>
+            {(certificateBase64 || editingAch.certificate?.url) ? (
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-zinc-950 border border-zinc-800">
+                <FileText className="w-6 h-6 text-indigo-400 shrink-0" />
+                <div className="flex flex-col gap-1 text-xs">
+                  <span className="text-zinc-200 font-semibold">
+                    {certificateBase64 ? certificateName : editingAch.certificate?.name || 'Proof Certificate'}
+                  </span>
+                  {editingAch.certificate?.url && (
+                    <a
+                      href={editingAch.certificate.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-400 hover:underline flex items-center gap-1 text-[11px]"
+                    >
+                      Preview Persisted Proof <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveCertificate}
+                  className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-rose-950 border border-rose-800 text-rose-300 hover:bg-rose-900 text-xs font-mono"
+                >
+                  <X className="w-3.5 h-3.5" /> Remove
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-zinc-800 rounded-lg hover:border-zinc-700 bg-zinc-950 cursor-pointer text-zinc-400 transition-colors">
+                <Upload className="w-6 h-6 mb-2 text-indigo-400" />
+                <span className="text-xs font-sans font-medium text-zinc-300">Click to upload proof/certificate</span>
+                <span className="text-[11px] font-mono text-zinc-500 mt-1">Supports PDF, JPG, PNG, WEBP (Max 10MB)</span>
+                <input
+                  type="file"
+                  accept="application/pdf, image/jpeg, image/png, image/webp"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800">

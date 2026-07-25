@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Phone, Send, MessageCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Send, MessageCircle, CheckCircle, AlertCircle } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from '@/components/ui/Icons';
 import { ISiteSettings, ISocialLink } from '@/types';
 
@@ -13,10 +13,10 @@ interface ContactSectionProps {
 
 export default function ContactSection({ content, settings, socialLinks = [] }: ContactSectionProps) {
   const eyebrow = content.contact_eyebrow || 'GET IN TOUCH';
-  const heading = content.contact_heading || "HAVE AN IDEA? LET'S BUILD SOMETHING EXTRAORDINARY.";
+  const heading = content.contact_heading || "Let's connect";
   const description =
     content.contact_description ||
-    "I'm currently open to internships, full-stack development roles, and engineering collaborations. Drop a message or reach out directly!";
+    "I'm open to software engineering internships, full-stack web developer roles, and technical collaborations. Reach out via email or send a direct message!";
 
   const [formData, setFormData] = useState({
     name: '',
@@ -51,7 +51,7 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
       setSuccess(true);
       setFormData({ name: '', email: '', subject: '', message: '', honeypot: '' });
     } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError(err.message || 'Something went wrong. You can email me directly instead.');
     } finally {
       setLoading(false);
     }
@@ -63,48 +63,36 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
   )}`;
 
   return (
-    <section id="contact" className="py-24 border-t border-zinc-800/60 bg-zinc-950/40 relative">
+    <section id="contact" className="py-20 border-t border-zinc-800/60 bg-zinc-950/40 relative">
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
-        <div className="flex flex-col gap-2 mb-16">
+        <div className="flex flex-col gap-2 mb-12">
           <span className="font-mono text-xs text-indigo-400 font-semibold tracking-wider uppercase">
             {eyebrow}
           </span>
-          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-zinc-100 max-w-3xl leading-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100 max-w-2xl font-sans">
             {heading}
           </h2>
-          <p className="text-base sm:text-lg text-zinc-400 max-w-2xl mt-2 font-sans">
+          <p className="text-sm sm:text-base text-zinc-400 max-w-xl font-sans">
             {description}
           </p>
-          <div className="w-12 h-1 bg-indigo-500 rounded-full mt-2" />
+          <div className="w-10 h-1 bg-indigo-500 rounded-full mt-2" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* Contact Details Column */}
-          <div className="lg:col-span-5 flex flex-col gap-6 font-mono text-sm">
+          <div className="lg:col-span-5 flex flex-col gap-4 font-mono text-xs">
+            {/* Primary Contacts */}
             <a
               href="mailto:kgarg5448@gmail.com"
-              className="flex items-center gap-4 p-5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group"
+              className="flex items-center gap-4 p-4.5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group shadow-sm"
             >
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                <Mail className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform shrink-0">
+                <Mail className="w-4 h-4" />
               </div>
-              <div>
-                <span className="text-xs text-zinc-500 uppercase block">Email Address</span>
-                <span className="text-zinc-200 font-sans text-base font-medium">kgarg5448@gmail.com</span>
-              </div>
-            </a>
-
-            <a
-              href="tel:+917982874404"
-              className="flex items-center gap-4 p-5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group"
-            >
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                <Phone className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-xs text-zinc-500 uppercase block">Phone / Mobile</span>
-                <span className="text-zinc-200 font-sans text-base font-medium">+91 7982874404</span>
+              <div className="truncate">
+                <span className="text-[10px] text-zinc-500 uppercase block font-mono">Email Address</span>
+                <span className="text-zinc-200 font-sans text-sm font-medium truncate block">kgarg5448@gmail.com</span>
               </div>
             </a>
 
@@ -112,61 +100,62 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
               href="https://linkedin.com/in/krishna-garg-56117a324"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 p-5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group"
+              className="flex items-center gap-4 p-4.5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group shadow-sm"
             >
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                <LinkedinIcon className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform shrink-0">
+                <LinkedinIcon className="w-4 h-4" />
               </div>
-              <div>
-                <span className="text-xs text-zinc-500 uppercase block">LinkedIn</span>
-                <span className="text-zinc-200 font-sans text-base font-medium">krishna-garg-56117a324</span>
+              <div className="truncate">
+                <span className="text-[10px] text-zinc-500 uppercase block font-mono">LinkedIn</span>
+                <span className="text-zinc-200 font-sans text-sm font-medium truncate block">krishna-garg-56117a324</span>
               </div>
             </a>
 
+            {/* Secondary Contact: GitHub */}
             <a
               href="https://github.com/kgarg007"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 p-5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group"
+              className="flex items-center gap-4 p-4.5 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all group shadow-sm"
             >
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                <GithubIcon className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 group-hover:scale-110 transition-transform shrink-0">
+                <GithubIcon className="w-4 h-4" />
               </div>
-              <div>
-                <span className="text-xs text-zinc-500 uppercase block">GitHub</span>
-                <span className="text-zinc-200 font-sans text-base font-medium">kgarg007</span>
+              <div className="truncate">
+                <span className="text-[10px] text-zinc-500 uppercase block font-mono">GitHub Profile</span>
+                <span className="text-zinc-200 font-sans text-sm font-medium truncate block">github.com/kgarg007</span>
               </div>
             </a>
 
-            {/* Optional WhatsApp Button */}
+            {/* WhatsApp Action Button (No Plain Phone Number Text) */}
             {whatsappEnabled && (
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 p-4 rounded-xl bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 hover:bg-emerald-900/40 font-mono text-sm font-semibold transition-all"
+                className="flex items-center justify-center gap-2 p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 hover:bg-emerald-900/40 font-mono text-xs font-semibold transition-all mt-1 shadow-sm"
               >
-                <MessageCircle className="w-4 h-4 text-emerald-400" /> Direct WhatsApp Action
+                <MessageCircle className="w-4 h-4 text-emerald-400" /> Direct WhatsApp Message
               </a>
             )}
           </div>
 
-          {/* Interactive Form Column */}
-          <div className="lg:col-span-7 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 p-8 sm:p-10">
-            <h3 className="text-xl font-bold text-zinc-100 font-sans mb-6">
+          {/* Contact Form Column */}
+          <div className="lg:col-span-7 rounded-xl bg-zinc-900/60 border border-zinc-800/80 p-6 sm:p-8 shadow-md">
+            <h3 className="text-lg font-bold text-zinc-100 font-sans mb-5">
               Send a Direct Message
             </h3>
 
             {success ? (
-              <div className="p-6 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-4 text-emerald-300 font-mono text-sm">
-                <CheckCircle className="w-6 h-6 shrink-0 text-emerald-400" />
+              <div className="p-5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3 text-emerald-300 font-mono text-xs">
+                <CheckCircle className="w-5 h-5 shrink-0 text-emerald-400" />
                 <div>
-                  <strong className="block font-bold">Message Delivered!</strong>
-                  Thank you for reaching out. Krishna will get back to you shortly.
+                  <strong className="block font-bold text-sm font-sans text-emerald-200">Thanks — your message was sent successfully.</strong>
+                  I will review your message and reply via email as soon as possible.
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5 font-mono text-sm">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
                 {/* Honeypot field for bot protection */}
                 <input
                   type="text"
@@ -179,71 +168,71 @@ export default function ContactSection({ content, settings, socialLinks = [] }: 
                 />
 
                 {error && (
-                  <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center gap-3 text-rose-300 text-xs">
+                  <div className="p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center gap-2.5 text-rose-300 text-xs">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{error}</span>
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-zinc-400 uppercase">Your Name *</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] text-zinc-400 uppercase">Your Name *</label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. John Doe"
+                      placeholder="e.g. Alex Smith"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans"
+                      className="px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs"
                     />
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-zinc-400 uppercase">Your Email *</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] text-zinc-400 uppercase">Your Email *</label>
                     <input
                       type="email"
                       required
-                      placeholder="john@example.com"
+                      placeholder="alex@example.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans"
+                      className="px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs"
                     />
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs text-zinc-400 uppercase">Subject</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] text-zinc-400 uppercase">Subject</label>
                   <input
                     type="text"
                     placeholder="Project Inquiry / Opportunity"
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans"
+                    className="px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs"
                   />
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs text-zinc-400 uppercase">Message *</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] text-zinc-400 uppercase">Message *</label>
                   <textarea
                     required
                     rows={4}
-                    placeholder="Tell me about your project or inquiry..."
+                    placeholder="Describe your project, role, or inquiry..."
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans resize-none"
+                    className="px-3.5 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors font-sans text-xs resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-all disabled:opacity-50"
+                  className="mt-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-all disabled:opacity-50 text-xs shadow-sm font-sans"
                 >
                   {loading ? (
-                    'Sending...'
+                    'Sending Message...'
                   ) : (
                     <>
-                      Send Message <Send className="w-4 h-4" />
+                      Send Message <Send className="w-3.5 h-3.5" />
                     </>
                   )}
                 </button>

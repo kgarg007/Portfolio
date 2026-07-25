@@ -7,6 +7,7 @@ const SkillSchema = new Schema<ISkillDoc>(
   {
     name: { type: String, required: true, trim: true },
     category: { type: String, required: true, index: true, default: 'Frontend' },
+    level: { type: String, default: '' },
     icon: { type: String, default: '' },
     visible: { type: Boolean, default: true, index: true },
     displayOrder: { type: Number, default: 0, index: true },

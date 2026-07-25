@@ -46,6 +46,8 @@ export interface ISiteSettings {
   sectionVisibility: ISectionVisibility;
   whatsappNumber?: string;
   whatsappMessage?: string;
+  currentlyBuilding?: string;
+  currentlyBuildingUrl?: string;
   profilePhoto?: IProfilePhoto;
   resume?: IResume;
   seo?: {
@@ -69,6 +71,9 @@ export interface IProject {
   role?: string;
   features?: string[];
   techStack: string[];
+  challenges?: string;
+  outcome?: string;
+  technicalDecisions?: string;
   coverImage?: {
     url: string;
     publicId?: string;
@@ -97,11 +102,20 @@ export interface IExperience {
   location?: string;
   startDate: string;
   endDate?: string;
+  startMonth?: string;
+  startYear?: string;
+  endMonth?: string;
+  endYear?: string;
   isCurrent: boolean;
   description: string[];
   technologies?: string[];
   logoUrl?: string;
   websiteUrl?: string;
+  certificate?: {
+    url: string;
+    publicId?: string;
+    name?: string;
+  };
   published: boolean;
   displayOrder: number;
   createdAt?: Date;
@@ -112,6 +126,7 @@ export interface ISkill {
   _id?: any;
   name: string;
   category: 'Frontend' | 'Backend' | 'Languages' | 'Data Analysis' | 'Tools & Soft Skills' | string;
+  level?: 'Core' | 'Intermediate' | 'Familiar' | 'Learning' | string;
   icon?: string;
   visible: boolean;
   displayOrder: number;
@@ -146,6 +161,11 @@ export interface IAchievement {
   description?: string;
   certificateUrl?: string;
   imageUrl?: string;
+  certificate?: {
+    url: string;
+    publicId?: string;
+    name?: string;
+  };
   featured: boolean;
   visible: boolean;
   displayOrder: number;

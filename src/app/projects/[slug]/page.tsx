@@ -4,7 +4,7 @@ import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import { getProjectBySlug, getAllPublishedProjectSlugs } from '@/lib/data';
-import { ArrowLeft, ExternalLink, Calendar, UserCheck, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Calendar, UserCheck, CheckCircle2, ShieldAlert, Trophy } from 'lucide-react';
 import { GithubIcon } from '@/components/ui/Icons';
 import Navbar from '@/components/public/Navbar';
 import Footer from '@/components/public/Footer';
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!project) return { title: 'Project Not Found' };
 
   return {
-    title: `${project.name} — Krishna Garg Case Study`,
+    title: `${project.name} — Technical Case Study`,
     description: project.shortDescription,
     openGraph: {
       title: `${project.name} — Technical Case Study`,
@@ -46,7 +46,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         {/* Back Link */}
         <Link
           href="/#projects"
-          className="inline-flex items-center gap-2 text-sm font-mono text-indigo-400 hover:text-indigo-300 transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-xs font-mono text-indigo-400 hover:text-indigo-300 transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Selected Work
         </Link>
@@ -54,7 +54,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         {/* Header Metadata */}
         <div className="flex flex-col gap-4 mb-8">
           <div className="flex items-center gap-3 font-mono text-xs">
-            <span className="px-3 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-indigo-400 font-semibold uppercase">
+            <span className="px-2.5 py-1 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-semibold uppercase">
               {project.category}
             </span>
             {project.startDate && (
@@ -64,20 +64,20 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             )}
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100">
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-zinc-100">
             {project.name}
           </h1>
 
-          <p className="text-xl text-zinc-300 leading-relaxed font-sans">
+          <p className="text-lg sm:text-xl text-zinc-300 leading-relaxed font-sans">
             {project.shortDescription}
           </p>
 
           {/* Role & Links Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-b border-zinc-800/80 py-4 font-mono text-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-b border-zinc-800/80 py-4 font-mono text-xs">
             {project.role && (
               <div className="flex items-center gap-2 text-zinc-400">
                 <UserCheck className="w-4 h-4 text-indigo-400" />
-                <span>Role: <strong className="text-zinc-200 font-normal">{project.role}</strong></span>
+                <span>My Role: <strong className="text-zinc-200 font-normal">{project.role}</strong></span>
               </div>
             )}
 
@@ -108,7 +108,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
         {/* Cover Image */}
         {project.coverImage?.url && (
-          <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border border-zinc-800 mb-12 bg-zinc-900">
+          <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border border-zinc-800 mb-12 bg-zinc-900 shadow-xl">
             <Image
               src={project.coverImage.url}
               alt={project.coverImage.altText || project.name}
@@ -120,7 +120,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
         {/* Tech Stack Pills */}
         {project.techStack?.length > 0 && (
-          <div className="flex flex-col gap-3 mb-12 p-6 rounded-xl bg-zinc-900/60 border border-zinc-800">
+          <div className="flex flex-col gap-3 mb-10 p-6 rounded-xl bg-zinc-900/60 border border-zinc-800">
             <span className="font-mono text-xs uppercase text-zinc-500 font-semibold">Technologies Used</span>
             <div className="flex flex-wrap gap-2 font-mono text-xs">
               {project.techStack.map((tech) => (
@@ -134,7 +134,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
         {/* Problem & Solution Grid */}
         {(project.problem || project.solution) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 font-sans">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 font-sans">
             {project.problem && (
               <div className="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800/80 flex flex-col gap-2">
                 <span className="font-mono text-xs font-bold text-indigo-400 uppercase">The Challenge</span>
@@ -150,11 +150,33 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           </div>
         )}
 
+        {/* Challenges & Outcome Section if defined */}
+        {(project.challenges || project.outcome) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 font-sans">
+            {project.challenges && (
+              <div className="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800/80 flex flex-col gap-2">
+                <span className="font-mono text-xs font-bold text-amber-400 uppercase flex items-center gap-1.5">
+                  <ShieldAlert className="w-3.5 h-3.5" /> Key Obstacles
+                </span>
+                <p className="text-zinc-300 text-sm leading-relaxed">{project.challenges}</p>
+              </div>
+            )}
+            {project.outcome && (
+              <div className="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800/80 flex flex-col gap-2">
+                <span className="font-mono text-xs font-bold text-indigo-400 uppercase flex items-center gap-1.5">
+                  <Trophy className="w-3.5 h-3.5" /> Project Outcome
+                </span>
+                <p className="text-zinc-300 text-sm leading-relaxed">{project.outcome}</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Key Features List */}
         {project.features && project.features.length > 0 && (
-          <div className="mb-12 flex flex-col gap-4">
-            <h3 className="font-mono text-sm font-bold uppercase text-zinc-400">Key Engineering Features</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="mb-10 flex flex-col gap-4">
+            <h3 className="font-mono text-xs font-bold uppercase text-zinc-400">Key Engineering Features</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
               {project.features.map((feat, idx) => (
                 <div key={idx} className="flex items-start gap-2.5 p-3.5 rounded-lg bg-zinc-900/40 border border-zinc-800/60 text-sm text-zinc-300">
                   <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
@@ -166,11 +188,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         )}
 
         {/* Full Case Study Markdown Body */}
-        <div className="prose prose-invert max-w-none prose-headings:font-sans prose-headings:font-bold prose-h2:text-2xl prose-h3:text-xl prose-p:text-zinc-300 prose-p:leading-relaxed prose-li:text-zinc-300 border-t border-zinc-800/80 pt-12">
-          <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
-            {project.fullDescription}
-          </ReactMarkdown>
-        </div>
+        {project.fullDescription && (
+          <div className="prose prose-invert max-w-none prose-headings:font-sans prose-headings:font-bold prose-h2:text-2xl prose-h3:text-xl prose-p:text-zinc-300 prose-p:leading-relaxed prose-li:text-zinc-300 border-t border-zinc-800/80 pt-10">
+            <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+              {project.fullDescription}
+            </ReactMarkdown>
+          </div>
+        )}
       </main>
 
       <Footer content={{ footer_copy: 'Krishna Garg Portfolio Case Study', footer_copyright: 'All rights reserved.' }} />

@@ -15,6 +15,9 @@ const ProjectSchema = new Schema<IProjectDoc>(
     role: { type: String, default: 'Full Stack Developer' },
     features: { type: [String], default: [] },
     techStack: { type: [String], default: [] },
+    challenges: { type: String, default: '' },
+    outcome: { type: String, default: '' },
+    technicalDecisions: { type: String, default: '' },
     coverImage: {
       url: { type: String, default: '' },
       publicId: { type: String, default: '' },
